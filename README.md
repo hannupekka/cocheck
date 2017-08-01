@@ -1,4 +1,4 @@
-# Checkem
+# Cocheck
 
 Make collaborative, real time checklists.
 

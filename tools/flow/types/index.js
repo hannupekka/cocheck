@@ -4,6 +4,17 @@ declare type ThunkAction = {
   +payload: Object
 }
 
+declare type ListState = {
+  +isLoading: boolean,
+  +isError: boolean,
+  +id: string,
+  +entities: {
+    +items: Object
+  },
+  +result: Array<Number>
+}
+
 declare type RootState = {
-  +router: Object
+  +list: ListState,
+  +router: Object,
 }

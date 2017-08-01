@@ -2,9 +2,11 @@
 import { combineReducers } from 'redux';
 import { combineEpics } from 'redux-observable';
 import { routerReducer } from 'react-router-redux';
+import list from 'redux/list';
 
 export const rootReducer = combineReducers({
-  router: routerReducer
+  list,
+  router: routerReducer,
 });
 
 export const rootEpic = combineEpics();
