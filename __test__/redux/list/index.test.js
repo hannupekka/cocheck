@@ -1,4 +1,11 @@
+/* eslint-env jest */
 import reducer, * as List from 'redux/list';
+
+// Mock firebase
+jest.mock('firebase/app', () => ({
+  ...jest.genMockFromModule('firebase/app'),
+  database: jest.fn(),
+}));
 
 describe('List actions', () => {
   it('should create action to create list', () => {
@@ -10,97 +17,119 @@ describe('List actions', () => {
     expect(List.createList()).toEqual(expected);
   });
 
-  it('should create action to delete list', () => {
+  it('should create action for list created successfully', () => {
     const expected = {
-      type: List.DELETE_LIST,
-      payload: {},
-    };
-
-    expect(List.deleteList()).toEqual(expected);
-  });
-
-  it('should create action to add item', () => {
-    const item = {
-      name: 'item name',
-      checked: false,
-    };
-
-    const result = List.addItem(item);
-    expect(result.type).toEqual(List.ADD_ITEM);
-    expect(result.payload).not.toHaveProperty('id', '');
-    expect(result.payload.name).toEqual(item.name);
-    expect(result.payload.checked).toEqual(item.checked);
-  });
-
-  it('should create action to edit item', () => {
-    const name = 'new name';
-
-    const expected = {
-      type: List.EDIT_ITEM,
+      type: List.CREATE_LIST_SUCCESS,
       payload: {
-        name,
+        id: '-foobar',
       },
     };
 
-    expect(List.editItem(name)).toEqual(expected);
+    expect(List.createListSuccess('-foobar')).toEqual(expected);
   });
 
-  it('should create action to check item', () => {
-    const id = 123;
-
+  it('should create action for list not created successfully', () => {
     const expected = {
-      type: List.CHECK_ITEM,
+      type: List.CREATE_LIST_FAILURE,
       payload: {
-        id,
+        errorMessage: 'Could not create new list',
       },
     };
 
-    expect(List.checkItem(id)).toEqual(expected);
+    expect(List.createListFailure()).toEqual(expected);
   });
 
-  it('should create action to uncheck item', () => {
-    const id = 123;
+  // it('should create action to delete list', () => {
+  //   const expected = {
+  //     type: List.DELETE_LIST,
+  //     payload: {},
+  //   };
 
-    const expected = {
-      type: List.UNCHECK_ITEM,
-      payload: {
-        id,
-      },
-    };
+  //   expect(List.deleteList()).toEqual(expected);
+  // });
 
-    expect(List.uncheckItem(id)).toEqual(expected);
-  });
+  // it('should create action to add item', () => {
+  //   const item = {
+  //     name: 'item name',
+  //     checked: false,
+  //   };
 
-  it('should create action to remove item', () => {
-    const id = 123;
+  //   const result = List.addItem(item);
+  //   expect(result.type).toEqual(List.ADD_ITEM);
+  //   expect(result.payload).not.toHaveProperty('id', '');
+  //   expect(result.payload.name).toEqual(item.name);
+  //   expect(result.payload.checked).toEqual(item.checked);
+  // });
 
-    const expected = {
-      type: List.REMOVE_ITEM,
-      payload: {
-        id,
-      },
-    };
+  // it('should create action to edit item', () => {
+  //   const name = 'new name';
 
-    expect(List.removeItem(id)).toEqual(expected);
-  });
+  //   const expected = {
+  //     type: List.EDIT_ITEM,
+  //     payload: {
+  //       name,
+  //     },
+  //   };
 
-  it('should create action to check all items', () => {
-    const expected = {
-      type: List.CHECK_ALL,
-      payload: {},
-    };
+  //   expect(List.editItem(name)).toEqual(expected);
+  // });
 
-    expect(List.checkAll()).toEqual(expected);
-  });
+  // it('should create action to check item', () => {
+  //   const id = 123;
 
-  it('should create action to uncheck all items', () => {
-    const expected = {
-      type: List.UNCHECK_ALL,
-      payload: {},
-    };
+  //   const expected = {
+  //     type: List.CHECK_ITEM,
+  //     payload: {
+  //       id,
+  //     },
+  //   };
 
-    expect(List.uncheckAll()).toEqual(expected);
-  });
+  //   expect(List.checkItem(id)).toEqual(expected);
+  // });
+
+  // it('should create action to uncheck item', () => {
+  //   const id = 123;
+
+  //   const expected = {
+  //     type: List.UNCHECK_ITEM,
+  //     payload: {
+  //       id,
+  //     },
+  //   };
+
+  //   expect(List.uncheckItem(id)).toEqual(expected);
+  // });
+
+  // it('should create action to remove item', () => {
+  //   const id = 123;
+
+  //   const expected = {
+  //     type: List.REMOVE_ITEM,
+  //     payload: {
+  //       id,
+  //     },
+  //   };
+
+  //   expect(List.removeItem(id)).toEqual(expected);
+  // });
+
+  // it('should create action to check all items', () => {
+  //   const expected = {
+  //     type: List.CHECK_ALL,
+  //     payload: {},
+  //   };
+
+  //   expect(List.checkAll()).toEqual(expected);
+  // });
+
+  // it('should create action to uncheck all items', () => {
+  //   const expected = {
+  //     type: List.UNCHECK_ALL,
+  //     payload: {},
+  //   };
+
+  //   expect(List.uncheckAll()).toEqual(expected);
+  // });
 });
 
 describe('List reducer', () => {
@@ -108,5 +137,58 @@ describe('List reducer', () => {
     expect(
       reducer(undefined, {})
     ).toEqual(List.initialState);
+  });
+
+  it('should handle CREATE_LIST', () => {
+    const action = {
+      type: List.CREATE_LIST,
+      payload: {},
+    };
+
+    const expected = {
+      ...List.initialState,
+      isLoading: true,
+    };
+
+    expect(
+      reducer(List.initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle CREATE_LIST_SUCCESS', () => {
+    const action = {
+      type: List.CREATE_LIST_SUCCESS,
+      payload: {
+        id: '-foobar',
+      },
+    };
+
+    const expected = {
+      ...List.initialState,
+      id: '-foobar',
+    };
+
+    expect(
+      reducer(List.initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle CREATE_LIST_FAILURE', () => {
+    const action = {
+      type: List.CREATE_LIST_FAILURE,
+      payload: {
+        errorMessage: 'Could not create new list',
+      },
+    };
+
+    const expected = {
+      ...List.initialState,
+      isError: true,
+      errorMessage: 'Could not create new list',
+    };
+
+    expect(
+      reducer(List.initialState, action)
+    ).toEqual(expected);
   });
 });

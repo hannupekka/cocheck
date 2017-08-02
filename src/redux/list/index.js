@@ -1,7 +1,13 @@
 // @flow
+import { Observable, Action } from 'rxjs';
 import cuid from 'cuid';
+import { push } from 'react-router-redux'
+import database from 'utils/database';
 
 export const CREATE_LIST = 'cocheck/list/CREATE_LIST';
+export const CREATE_LIST_SUCCESS = 'cocheck/list/CREATE_LIST_SUCCESS';
+export const CREATE_LIST_FAILURE = 'cocheck/list/CREATE_LIST_FAILURE';
+
 export const DELETE_LIST = 'cocheck/list/DELETE_LIST';
 
 export const ADD_ITEM = 'cocheck/list/ADD_ITEM';
@@ -16,6 +22,20 @@ export const UNCHECK_ALL = 'cocheck/list/UNCHECK_ALL';
 export const createList = (): ThunkAction => ({
   type: CREATE_LIST,
   payload: {},
+});
+
+export const createListSuccess = (id: string): ThunkAction => ({
+  type: CREATE_LIST_SUCCESS,
+  payload: {
+    id,
+  },
+});
+
+export const createListFailure = (): ThunkAction => ({
+  type: CREATE_LIST_FAILURE,
+  payload: {
+    errorMessage: 'Could not create new list',
+  },
 });
 
 export const deleteList = (): ThunkAction => ({
@@ -70,9 +90,25 @@ export const uncheckAll = (): ThunkAction => ({
   payload: {},
 });
 
+export const createListEpic =
+  (action$: Observable<Action>): Observable<Action> =>
+    action$.ofType(CREATE_LIST)
+      .flatMap(() => {
+        const listsRef = database.ref('/lists');
+        const list = listsRef.push({ created: new Date().toISOString() });
+        const id = list.ref.key;
+
+        return Observable.concat(
+          Observable.of(createListSuccess(id)),
+          Observable.of(push(`/list/${id}`))
+        );
+      })
+      .catch(() => Observable.of(createListFailure()));
+
 export const initialState: ListState = {
   isLoading: false,
   isError: false,
+  errorMessage: '',
   id: '',
   entities: {
     items: {},
@@ -82,6 +118,22 @@ export const initialState: ListState = {
 
 export default function reducer(state: ListState = initialState, action: ThunkAction): ListState {
   switch (action.type) {
+    case CREATE_LIST:
+      return {
+        ...initialState,
+        isLoading: true,
+      };
+    case CREATE_LIST_SUCCESS:
+      return {
+        ...initialState,
+        id: action.payload.id,
+      };
+    case CREATE_LIST_FAILURE:
+      return {
+        ...initialState,
+        isError: true,
+        errorMessage: action.payload.errorMessage,
+      };
     default:
       return state;
   }

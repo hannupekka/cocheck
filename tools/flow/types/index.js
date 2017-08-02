@@ -7,6 +7,7 @@ declare type ThunkAction = {
 declare type ListState = {
   +isLoading: boolean,
   +isError: boolean,
+  +errorMessage: string,
   +id: string,
   +entities: {
     +items: Object

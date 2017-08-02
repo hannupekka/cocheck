@@ -5,18 +5,19 @@ const postcssFixes = require('postcss-fixes');
 const cssnano = require('cssnano');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 const postcssOptions = {
   plugins: [
     postcssFixes(),
     autoprefixer({
-      browsers: ['last 2 version', 'IE >= 9']
+      browsers: ['last 2 version', 'IE >= 9'],
     }),
     cssnano({
       safe: true,
-      calc: false
-    })
-  ]
+      calc: false,
+    }),
+  ],
 };
 
 module.exports = {
@@ -30,34 +31,35 @@ module.exports = {
     chunkOrigins: false,
     modules: false,
     reasons: false,
-    source: false
+    source: false,
   },
   devtool: 'source-map',
   entry: [
-    './src/index'
+    './src/index',
   ],
   output: {
     path: path.join(__dirname, '../dist'),
     filename: 'bundle.[hash].js',
-    publicPath: '/'
+    publicPath: '/',
   },
   plugins: [
+    new Dotenv(),
     new ExtractTextPlugin({
       filename: 'styles.[hash].css',
-      allChunks: true
+      allChunks: true,
     }),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('production')
+      'process.env.NODE_ENV': JSON.stringify('production'),
     }),
     new webpack.optimize.UglifyJsPlugin({
       compressor: {
         warnings: false,
-        drop_console: true
-      }
+        drop_console: true,
+      },
     }),
     new HtmlWebpackPlugin({
-      template: './src/html/index.prod.html'
-    })
+      template: './src/html/index.prod.html',
+    }),
   ],
   module: {
     rules: [
@@ -74,15 +76,15 @@ module.exports = {
             {
               loader: 'css-loader',
               options: {
-                importLoaders: true
-              }
+                importLoaders: true,
+              },
             },
             {
               loader: 'postcss-loader',
-              options: postcssOptions
-            }
-          ]
-        })
+              options: postcssOptions,
+            },
+          ],
+        }),
       },
       {
         test: /\.less$/,
@@ -94,18 +96,18 @@ module.exports = {
               options: {
                 modules: true,
                 importLoaders: true,
-                localIdentName: '[name]__[local]___[hash:base64:5]'
-              }
+                localIdentName: '[name]__[local]___[hash:base64:5]',
+              },
             },
             {
               loader: 'postcss-loader',
-              options: postcssOptions
+              options: postcssOptions,
             },
             {
-              loader: 'less-loader'
-            }
-          ]
-        })
+              loader: 'less-loader',
+            },
+          ],
+        }),
       },
       {
         test: /\.woff(2)?(\?v=\d+\.\d+\.\d+)?$/,
@@ -114,10 +116,10 @@ module.exports = {
             loader: 'url-loader',
             options: {
               limit: 10000,
-              mimetype: 'application/font-woff'
-            }
-          }
-        ]
+              mimetype: 'application/font-woff',
+            },
+          },
+        ],
       }, {
         test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
         use: [
@@ -125,10 +127,10 @@ module.exports = {
             loader: 'url-loader',
             options: {
               limit: 10000,
-              mimetype: 'application/octet-stream'
-            }
-          }
-        ]
+              mimetype: 'application/octet-stream',
+            },
+          },
+        ],
       }, {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
         use: [
@@ -136,33 +138,33 @@ module.exports = {
             loader: 'url-loader',
             options: {
               limit: 10000,
-              mimetype: 'image/svg+xml'
-            }
-          }
-        ]
+              mimetype: 'image/svg+xml',
+            },
+          },
+        ],
       }, {
         test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
         use: [
           {
-            loader: 'file-loader'
-          }
-        ]
+            loader: 'file-loader',
+          },
+        ],
       },
       {
         test: /\.(png|jpg|gif)$/,
         use: [
           {
-            loader: 'file-loader'
-          }
-        ]
-      }
-    ]
+            loader: 'file-loader',
+          },
+        ],
+      },
+    ],
   },
   resolve: {
     extensions: ['.js', '.less'],
     modules: [
       'node_modules',
-      path.resolve('./src')
-    ]
-  }
+      path.resolve('./src'),
+    ],
+  },
 };

@@ -39,15 +39,6 @@
     "max-len": ["error", 100],
     "comma-dangle": ["error", "always-multiline"]
   },
-  "globals": {
-    "describe": false,
-    "it": false,
-    "before": false,
-    "beforeEach": false,
-    "after": false,
-    "afterEach": false,
-    "expect": false
-  },
   "env": {
     "browser": true
   },
