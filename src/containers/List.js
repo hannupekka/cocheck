@@ -2,7 +2,9 @@
 import styles from 'styles/containers/List.less';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { StickyContainer, Sticky } from 'react-sticky';
 import CSSModules from 'react-css-modules';
+import ListHeader from 'components/ListHeader';
 
 type Props = {};
 
@@ -11,7 +13,14 @@ export class List extends Component {
   props: Props;
 
   render() {
-    return <div>Here be list content!</div>;
+    return (
+      <StickyContainer>
+        <Sticky topOffset={-16}>
+          {({ isSticky, style }) => <ListHeader isSticky={isSticky} style={style} />}
+        </Sticky>
+        <p>Here be list content!</p>
+      </StickyContainer>
+    );
   }
 }
 

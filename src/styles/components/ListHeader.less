@@ -1,0 +1,19 @@
+@import '~styles/main';
+
+.static {
+  display: flex;
+  justify-content: space-around;
+  margin: 0 -@padding;
+}
+
+.sticky {
+  composes: static;
+  background-color: @color__white;
+  padding: @padding 0;
+  width: 100% !important;
+  border-bottom: 1px solid darken(@color__white, 15%);
+}
+
+.button {
+  composes: base--button;
+}

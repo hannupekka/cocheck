@@ -7,4 +7,12 @@
 
 .base--button {
   padding: (@padding / 2) @padding;
+  background-color: @color__yellow;
+  border: none;
+  box-shadow: 1px 1px 1px darken(@color__yellow, 20%);
+
+  &:hover {
+    cursor: pointer;
+    background-color: darken(@color__yellow, 5%);
+  }
 }
