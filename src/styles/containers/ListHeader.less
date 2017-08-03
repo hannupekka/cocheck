@@ -1,9 +1,8 @@
 @import '~styles/main';
 
 .static {
-  display: flex;
-  justify-content: space-around;
   margin: 0 -@padding;
+  text-align: center;
 }
 
 .sticky {
@@ -16,4 +15,8 @@
 
 .button {
   composes: base--button;
+
+  & + & {
+    margin-left: @padding;
+  }
 }

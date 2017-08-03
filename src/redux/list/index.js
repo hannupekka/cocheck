@@ -3,12 +3,15 @@ import { Observable, Action } from 'rxjs';
 import cuid from 'cuid';
 import { push } from 'react-router-redux'
 import database from 'utils/database';
+import { hideConfirmation } from 'redux/confirm';
 
 export const CREATE_LIST = 'cocheck/list/CREATE_LIST';
 export const CREATE_LIST_SUCCESS = 'cocheck/list/CREATE_LIST_SUCCESS';
 export const CREATE_LIST_FAILURE = 'cocheck/list/CREATE_LIST_FAILURE';
 
 export const DELETE_LIST = 'cocheck/list/DELETE_LIST';
+export const DELETE_LIST_SUCCESS = 'cocheck/list/DELETE_LIST_SUCCESS';
+export const DELETE_LIST_FAILURE = 'cocheck/list/DELETE_LIST_FAILURE';
 
 export const ADD_ITEM = 'cocheck/list/ADD_ITEM';
 export const EDIT_ITEM = 'cocheck/list/EDIT_ITEM';
@@ -38,9 +41,23 @@ export const createListFailure = (): ThunkAction => ({
   },
 });
 
-export const deleteList = (): ThunkAction => ({
+export const deleteList = (id: string): ThunkAction => ({
   type: DELETE_LIST,
+  payload: {
+    id,
+  },
+});
+
+export const deleteListSuccess = (): ThunkAction => ({
+  type: DELETE_LIST_SUCCESS,
   payload: {},
+});
+
+export const deleteListFailure = (): ThunkAction => ({
+  type: DELETE_LIST_FAILURE,
+  payload: {
+    errorMessage: 'Could not delete list',
+  },
 });
 
 export const addItem = ({ name, checked }: { name: string, checked: boolean }): ThunkAction => ({
@@ -104,6 +121,20 @@ export const createListEpic =
         );
       })
       .catch(() => Observable.of(createListFailure()));
+
+export const deleteListEpic =
+  (action$: Observable<Action>): Observable<Action> =>
+    action$.ofType(DELETE_LIST)
+      .flatMap(action => {
+        database.ref('/lists').child(action.payload.id).remove()
+
+        return Observable.concat(
+          Observable.of(hideConfirmation()),
+          Observable.of(deleteListSuccess()),
+          Observable.of(push(`/`))
+        );
+      })
+      .catch(() => Observable.of(deleteListFailure()));
 
 export const initialState: ListState = {
   isLoading: false,
