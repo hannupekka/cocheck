@@ -1,0 +1,41 @@
+@import '~styles/main';
+
+.wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: @padding;
+}
+
+.content {
+  background: #fff;
+  display: inline-block;
+  text-align: center;
+  padding: @padding * 2;
+}
+
+.text {
+  margin-bottom: @padding;
+}
+
+.button__trigger {
+  composes: base--button;
+}
+
+.button__dialog {
+  composes: button__trigger;
+  display: block;
+  margin: auto;
+  width: 100%;
+
+  & + & {
+    margin-top: @padding;
+  }
+}

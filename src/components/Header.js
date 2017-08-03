@@ -11,7 +11,7 @@ type Props = {
 };
 
 const Header: Component<Props> = (props: Props): React$Element<any> =>
-  <header styleName="header">
+  <header styleName="header" id="header">
     <h1 styleName="title">
       <Link to="/">Cocheck</Link>
     </h1>

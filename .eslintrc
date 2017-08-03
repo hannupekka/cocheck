@@ -37,7 +37,8 @@
     }],
     "flowtype/define-flow-type": 2,
     "max-len": ["error", 100],
-    "comma-dangle": ["error", "always-multiline"]
+    "comma-dangle": ["error", "always-multiline"],
+    "import/no-named-as-default": 0
   },
   "env": {
     "browser": true

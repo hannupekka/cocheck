@@ -4,6 +4,12 @@ declare type ThunkAction = {
   +payload: Object
 }
 
+declare type ConfirmState = {
+  +isVisible: boolean,
+  +text: string,
+  +onConfirm: ?Function,
+}
+
 declare type ListState = {
   +isLoading: boolean,
   +isError: boolean,
@@ -16,6 +22,7 @@ declare type ListState = {
 }
 
 declare type RootState = {
+  +confirm: ConfirmState,
   +list: ListState,
   +router: Object,
 }
