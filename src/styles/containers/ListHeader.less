@@ -7,14 +7,14 @@
 
 .sticky {
   composes: static;
-  background-color: @color__white;
+  background-color: @color__light;
   padding: @padding 0;
   width: 100% !important;
-  border-bottom: 1px solid darken(@color__white, 15%);
+  border-bottom: 1px solid darken(@color__light, 15%);
 }
 
 .button {
-  composes: base--button;
+  composes: base__button;
 
   & + & {
     margin-left: @padding;

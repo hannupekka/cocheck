@@ -1,18 +1,18 @@
 @import 'variables';
 
 // Base styles for reusable components like form elements.
-.base--input {
+.base__input {
   padding: (@padding / 2) @padding;
 }
 
-.base--button {
+.base__button {
   padding: (@padding / 2) @padding;
-  background-color: @color__yellow;
+  background-color: @color__accent;
   border: none;
-  box-shadow: 1px 1px 1px darken(@color__yellow, 20%);
+  box-shadow: 1px 1px 1px darken(@color__accent, 20%);
 
   &:hover {
     cursor: pointer;
-    background-color: darken(@color__yellow, 5%);
+    background-color: darken(@color__accent, 5%);
   }
 }
