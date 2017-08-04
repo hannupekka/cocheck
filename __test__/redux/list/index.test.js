@@ -39,16 +39,68 @@ describe('List actions', () => {
     expect(List.createListFailure()).toEqual(expected);
   });
 
+  it('should create action to read list', () => {
+    const expected = {
+      type: List.READ_LIST,
+      payload: {
+        id: 'foo-123',
+      },
+    };
+
+    expect(List.readList('foo-123')).toEqual(expected);
+  });
+
+  it('should create action for list read successfully', () => {
+    const expected = {
+      type: List.READ_LIST_SUCCESS,
+      payload: {
+        id: 'foo-123',
+      },
+    };
+
+    expect(List.readListSuccess('foo-123')).toEqual(expected);
+  });
+
+  it('should create action for list not read successfully', () => {
+    const expected = {
+      type: List.READ_LIST_FAILURE,
+      payload: {
+        errorMessage: 'Could not read list',
+      },
+    };
+
+    expect(List.readListFailure()).toEqual(expected);
+  });
+
   it('should create action to delete list', () => {
-    expect(true).toEqual(false);
+    const expected = {
+      type: List.DELETE_LIST,
+      payload: {
+        id: 'foo-123',
+      },
+    };
+
+    expect(List.deleteList('foo-123')).toEqual(expected);
   });
 
   it('should create action for list deleted successfully', () => {
-    expect(true).toEqual(false);
+    const expected = {
+      type: List.DELETE_LIST_SUCCESS,
+      payload: {},
+    };
+
+    expect(List.deleteListSuccess()).toEqual(expected);
   });
 
   it('should create action for list not deleted successfully', () => {
-    expect(true).toEqual(false);
+    const expected = {
+      type: List.DELETE_LIST_FAILURE,
+      payload: {
+        errorMessage: 'Could not delete list',
+      },
+    };
+
+    expect(List.deleteListFailure()).toEqual(expected);
   });
 });
 
@@ -112,15 +164,134 @@ describe('List reducer', () => {
     ).toEqual(expected);
   });
 
+  it('should handle READ_LIST', () => {
+    const action = {
+      type: List.READ_LIST,
+      payload: {
+        id: 'foo-123',
+      },
+    };
+
+    const expected = {
+      ...List.initialState,
+      isLoading: true,
+    };
+
+    expect(
+      reducer(List.initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle READ_LIST_SUCCESS', () => {
+    const initialState = {
+      ...List.initialState,
+      isLoading: true,
+    };
+
+    const action = {
+      type: List.READ_LIST_SUCCESS,
+      payload: {
+        id: 'foo-123',
+      },
+    };
+
+    const expected = {
+      ...List.initialState,
+      id: 'foo-123',
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle READ_LIST_FAILURE', () => {
+    const initialState = {
+      ...List.initialState,
+      isLoading: true,
+    };
+
+    const action = {
+      type: List.READ_LIST_FAILURE,
+      payload: {
+        errorMessage: 'Could not read list',
+      },
+    };
+
+    const expected = {
+      ...List.initialState,
+      isError: true,
+      errorMessage: 'Could not read list',
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
   it('should handle DELETE_LIST', () => {
-    expect(true).toEqual(false);
+    const initialState = {
+      ...List.initialState,
+      id: 'foo-123',
+    };
+
+    const action = {
+      type: List.DELETE_LIST,
+      payload: {
+        id: 'foo-123',
+      },
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: true
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
   });
 
   it('should handle DELETE_LIST_SUCCESS', () => {
-    expect(true).toEqual(false);
+    const initialState = {
+      ...List.initialState,
+      isLoading: true,
+      id: 'foo-123',
+    };
+
+    const action = {
+      type: List.DELETE_LIST_SUCCESS,
+      payload: {},
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(List.initialState);
   });
 
   it('should handle DELETE_LIST_FAILURE', () => {
-    expect(true).toEqual(false);
+    const initialState = {
+      ...List.initialState,
+      isLoading: true,
+      id: 'foo-123',
+    };
+
+    const action = {
+      type: List.DELETE_LIST_FAILURE,
+      payload: {
+        errorMessage: 'Could not delete list',
+      },
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: false,
+      isError: true,
+      errorMessage: 'Could not delete list',
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
   });
 });

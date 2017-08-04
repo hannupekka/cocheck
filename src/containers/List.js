@@ -5,14 +5,27 @@ import { connect } from 'react-redux';
 import { StickyContainer, Sticky } from 'react-sticky';
 import CSSModules from 'react-css-modules';
 import ListHeader from 'containers/ListHeader';
+import bindWatchers from 'utils/watchers';
+import { readList } from 'redux/list';
 
 type Props = {
   dispatch: Function,
+  match: Object,
 };
 
-// eslint-disable-next-line
 export class List extends Component {
   props: Props;
+
+  componentWillMount = () => {
+    const { dispatch, match } = this.props;
+    const id = match.params[0];
+
+    // Get list ID from router params.
+    dispatch(readList(id));
+
+    // Bind Firebase watchers.
+    bindWatchers(id, dispatch);
+  };
 
   render() {
     return (
