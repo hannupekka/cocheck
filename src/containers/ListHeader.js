@@ -18,10 +18,7 @@ type Props = {
 export class ListHeader extends Component {
   props: Props;
 
-  onCheckAllConfirm = (): void => {
-    // eslint-disable-next-line
-    console.log('check all confirmed');
-  };
+  onCheckAllConfirm = (): void => {};
 
   onCheckAllClick = (): void => {
     const { dispatch } = this.props;

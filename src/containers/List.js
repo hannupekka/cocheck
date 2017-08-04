@@ -11,6 +11,7 @@ import { readList } from 'redux/list';
 type Props = {
   dispatch: Function,
   match: Object,
+  isLoading: boolean,
 };
 
 export class List extends Component {
@@ -27,12 +28,24 @@ export class List extends Component {
     bindWatchers(id, dispatch);
   };
 
+  renderHeader = (): ?React$Element<any> => {
+    const { isLoading } = this.props;
+
+    if (isLoading) {
+      return null;
+    }
+
+    return (
+      <Sticky topOffset={-16}>
+        {({ isSticky, style }) => <ListHeader isSticky={isSticky} style={style} />}
+      </Sticky>
+    );
+  };
+
   render() {
     return (
       <StickyContainer>
-        <Sticky topOffset={-16}>
-          {({ isSticky, style }) => <ListHeader isSticky={isSticky} style={style} />}
-        </Sticky>
+        {this.renderHeader()}
         <p>Here be list content!</p>
         <p>Here be list content!</p>
         <p>Here be list content!</p>
@@ -61,9 +74,13 @@ export class List extends Component {
   }
 }
 
-type MappedState = {};
+type MappedState = {
+  isLoading: boolean,
+};
 
 // eslint-disable-next-line
-const mapState: Function = (state: RootState): MappedState => ({});
+const mapState: Function = (state: RootState): MappedState => ({
+  isLoading: state.list.isLoading,
+});
 
 export default connect(mapState)(CSSModules(List, styles));

@@ -4,6 +4,7 @@ import { Observable, Action } from 'rxjs';
 import { push } from 'react-router-redux'
 import database from 'utils/database';
 import { hideConfirmation } from 'redux/confirm';
+import { showNotification } from 'redux/notification';
 
 export const CREATE_LIST = 'cocheck/list/CREATE_LIST';
 export const CREATE_LIST_SUCCESS = 'cocheck/list/CREATE_LIST_SUCCESS';
@@ -16,6 +17,8 @@ export const READ_LIST_FAILURE = 'cocheck/list/READ_LIST_FAILURE';
 export const DELETE_LIST = 'cocheck/list/DELETE_LIST';
 export const DELETE_LIST_SUCCESS = 'cocheck/list/DELETE_LIST_SUCCESS';
 export const DELETE_LIST_FAILURE = 'cocheck/list/DELETE_LIST_FAILURE';
+
+export const HANDLE_ERROR = 'cocheck/list/HANDLE_ERROR';
 
 // export const ADD_ITEM = 'cocheck/list/ADD_ITEM';
 // export const EDIT_ITEM = 'cocheck/list/EDIT_ITEM';
@@ -132,6 +135,11 @@ export const deleteListFailure = (): ThunkAction => ({
 //   payload: {},
 // });
 
+export const handleError = (error: Object): ThunkAction => ({
+  type: HANDLE_ERROR,
+  payload: error,
+});
+
 export const createListEpic =
   (action$: Observable<Action>): Observable<Action> =>
     action$.ofType(CREATE_LIST)
@@ -145,7 +153,7 @@ export const createListEpic =
           Observable.of(push(`/list/${id}`))
         );
       })
-      .catch(() => Observable.of(createListFailure()));
+      .catch(error => Observable.of(handleError(error)));
 
 export const readListEpic =
   (action$: Observable<Action>): Observable<Action> =>
@@ -156,15 +164,20 @@ export const readListEpic =
       })
       .flatMap(snapshot => {
         const listExists = snapshot.val() !== null;
-
         return listExists
           ? Observable.of(readListSuccess(snapshot.key))
           : Observable.concat(
               Observable.of(readListFailure()),
-              Observable.of(push('/'))
+              Observable.of(push('/')),
+              Observable.of(showNotification({
+                title: 'Error',
+                body: 'List not found!',
+                icon: 'exclamation',
+                type: 'error',
+              }))
           );
       })
-      .catch(() => Observable.of(readListFailure()));
+      .catch(error => Observable.of(handleError(error)));
 
 export const deleteListEpic =
   (action$: Observable<Action>): Observable<Action> =>
@@ -174,16 +187,31 @@ export const deleteListEpic =
 
         return Observable.concat(
           Observable.of(hideConfirmation()),
-          Observable.of(deleteListSuccess())
+          Observable.of(deleteListSuccess()),
+          Observable.of(showNotification({
+            title: 'OK',
+            body: 'List deleted!',
+            icon: 'trash',
+            type: 'success',
+          }))
         );
       })
-      .catch(() => Observable.of(deleteListFailure()));
+      .catch(error => Observable.of(handleError(error)));
 
 export const deleteListWatchEpic =
   (action$: Observable<Action>): Observable<Action> =>
     action$.ofType(DELETE_LIST_SUCCESS)
       .flatMap(() => Observable.of(push('/')))
-      .catch(() => Observable.of(deleteListFailure()));
+      .catch(error => Observable.of(handleError(error)));
+
+export const handleErrorEpic =
+  (action$: Observable<Action>): Observable<Action> =>
+    action$.ofType(HANDLE_ERROR)
+      .flatMap(action => {
+        // eslint-disable-next-line
+        console.error(action.payload.message);
+        return Observable.of(push('/'));
+      });
 
 export const initialState: ListState = {
   isLoading: false,
@@ -216,6 +244,7 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
         id: action.payload.id,
       };
     case DELETE_LIST_SUCCESS:
+    case HANDLE_ERROR:
       return initialState;
     case CREATE_LIST_FAILURE:
     case READ_LIST_FAILURE:

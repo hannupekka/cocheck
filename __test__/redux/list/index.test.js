@@ -102,6 +102,16 @@ describe('List actions', () => {
 
     expect(List.deleteListFailure()).toEqual(expected);
   });
+
+  it('should create action to handle error', () => {
+    const error = new Error('error');
+    const expected = {
+      type: List.HANDLE_ERROR,
+      payload: error,
+    };
+
+    expect(List.handleError(error)).toEqual(expected);
+  });
 });
 
 describe('List reducer', () => {
@@ -244,7 +254,7 @@ describe('List reducer', () => {
 
     const expected = {
       ...initialState,
-      isLoading: true
+      isLoading: true,
     };
 
     expect(
@@ -293,5 +303,16 @@ describe('List reducer', () => {
     expect(
       reducer(initialState, action)
     ).toEqual(expected);
+  });
+
+  it('should handle HANDLE_ERROR', () => {
+    const action = {
+      type: List.HANDLE_ERROR,
+      payload: new Error('error'),
+    };
+
+    expect(
+      reducer(List.initialState, action)
+    ).toEqual(List.initialState);
   });
 });
