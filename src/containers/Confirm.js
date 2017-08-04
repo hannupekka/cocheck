@@ -35,13 +35,13 @@ export class Confirm extends Component {
           <div styleName="text">
             {text}
           </div>
-          <button styleName="button__dialog" onClick={onConfirm}>
+          <button styleName="button" onClick={onConfirm}>
             <i className="fa fa-check" aria-hidden="true" />
-            Yes!
+            Yes
           </button>
-          <button styleName="button__dialog" onClick={this.onCancel}>
+          <button styleName="button" onClick={this.onCancel}>
             <i className="fa fa-ban" aria-hidden="true" />
-            No, cancel!
+            No, cancel
           </button>
         </div>
       </div>
