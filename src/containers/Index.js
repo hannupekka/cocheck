@@ -12,14 +12,30 @@ type Props = {
 export class Index extends Component {
   props: Props;
 
+  nameField: HTMLInputElement;
+  bindNameField: Function;
+
+  constructor(props: Object) {
+    super(props);
+
+    this.bindNameField = c => (this.nameField = c);
+  }
+
   onCreateList = (): void => {
     const { dispatch } = this.props;
-    dispatch(ListActions.createList());
+    const name = this.nameField.value;
+    dispatch(ListActions.createList(name));
   };
 
   render() {
     return (
       <div>
+        <input
+          type="text"
+          styleName="input"
+          placeholder="List name (optional)"
+          ref={this.bindNameField}
+        />
         <button styleName="button" onClick={this.onCreateList}>
           Create new list
         </button>

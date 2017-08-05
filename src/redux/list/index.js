@@ -29,15 +29,18 @@ export const HANDLE_ERROR = 'cocheck/list/HANDLE_ERROR';
 // export const CHECK_ALL = 'cocheck/list/CHECK_ALL';
 // export const UNCHECK_ALL = 'cocheck/list/UNCHECK_ALL';
 
-export const createList = (): ThunkAction => ({
+export const createList = (name: string): ThunkAction => ({
   type: CREATE_LIST,
-  payload: {},
+  payload: {
+    name,
+  },
 });
 
-export const createListSuccess = (id: string): ThunkAction => ({
+export const createListSuccess = ({ id, name }: { id: string, name: string }): ThunkAction => ({
   type: CREATE_LIST_SUCCESS,
   payload: {
     id,
+    name,
   },
 });
 
@@ -53,10 +56,11 @@ export const readList = (id: string): ThunkAction => ({
   },
 });
 
-export const readListSuccess = (id: string): ThunkAction => ({
+export const readListSuccess = ({ id, name }: { id: string, name: string }): ThunkAction => ({
   type: READ_LIST_SUCCESS,
   payload: {
     id,
+    name,
   },
 });
 
@@ -137,13 +141,19 @@ export const handleError = (error: Object): ThunkAction => ({
 export const createListEpic =
   (action$: Observable<Action>): Observable<Action> =>
     action$.ofType(CREATE_LIST)
-      .flatMap(() => {
+      .flatMap(action => {
         const listsRef = database.ref('/lists');
-        const list = listsRef.push({ created: new Date().toISOString() });
+        const list = listsRef.push({
+          name: action.payload.name,
+          created: new Date().toISOString(),
+        });
         const id = list.ref.key;
 
         return Observable.concat(
-          Observable.of(createListSuccess(id)),
+          Observable.of(createListSuccess({
+            id,
+            name: action.payload.name,
+          })),
           Observable.of(push(`/list/${id}`))
         );
       })
@@ -157,9 +167,14 @@ export const readListEpic =
         return Observable.fromPromise(listRef.once('value'));
       })
       .flatMap(snapshot => {
-        const listExists = snapshot.val() !== null;
+        const list = snapshot.val();
+        const listExists = list !== null;
+
         return listExists
-          ? Observable.of(readListSuccess(snapshot.key))
+          ? Observable.of(readListSuccess({
+            id: snapshot.key,
+            name: list.name,
+          }))
           : Observable.concat(
               Observable.of(readListFailure()),
               Observable.of(push('/')),
@@ -210,6 +225,7 @@ export const handleErrorEpic =
 export const initialState: ListState = {
   isLoading: false,
   id: '',
+  name: '',
   entities: {
     items: {},
   },
@@ -234,6 +250,7 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
       return {
         ...initialState,
         id: action.payload.id,
+        name: action.payload.name,
       };
     case DELETE_LIST_SUCCESS:
     case CREATE_LIST_FAILURE:

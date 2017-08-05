@@ -10,6 +10,7 @@ import * as ListActions from 'redux/list';
 type Props = {
   dispatch: Function,
   id: string,
+  name: string,
   isSticky: boolean,
   style: Object,
 };
@@ -45,10 +46,25 @@ export class ListHeader extends Component {
     );
   };
 
+  maybeRenderListName = (): ?React$Element<any> => {
+    const { name } = this.props;
+
+    if (name === '') {
+      return null;
+    }
+
+    return (
+      <div styleName="name">
+        {name}
+      </div>
+    );
+  };
+
   render() {
     const { style, isSticky } = this.props;
     return (
       <div style={style} styleName={isSticky ? 'sticky' : 'static'}>
+        {this.maybeRenderListName()}
         <button styleName="button" onClick={this.onCheckAllClick}>
           Check all
         </button>
@@ -62,11 +78,13 @@ export class ListHeader extends Component {
 
 type MappedState = {
   id: string,
+  name: string,
 };
 
 // eslint-disable-next-line
 const mapState: Function = (state: RootState): MappedState => ({
   id: state.list.id,
+  name: state.list.name,
 });
 
 export default connect(mapState)(pure(CSSModules(ListHeader, styles)));

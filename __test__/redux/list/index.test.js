@@ -11,10 +11,12 @@ describe('List actions', () => {
   it('should create action to create list', () => {
     const expected = {
       type: List.CREATE_LIST,
-      payload: {},
+      payload: {
+        name: 'list name',
+      },
     };
 
-    expect(List.createList()).toEqual(expected);
+    expect(List.createList('list name')).toEqual(expected);
   });
 
   it('should create action for list created successfully', () => {
@@ -22,10 +24,14 @@ describe('List actions', () => {
       type: List.CREATE_LIST_SUCCESS,
       payload: {
         id: '-foobar',
+        name: 'list name',
       },
     };
 
-    expect(List.createListSuccess('-foobar')).toEqual(expected);
+    expect(List.createListSuccess({
+      id: '-foobar',
+      name: 'list name',
+    })).toEqual(expected);
   });
 
   it('should create action for list not created successfully', () => {
@@ -53,10 +59,14 @@ describe('List actions', () => {
       type: List.READ_LIST_SUCCESS,
       payload: {
         id: 'foo-123',
+        name: 'list name',
       },
     };
 
-    expect(List.readListSuccess('foo-123')).toEqual(expected);
+    expect(List.readListSuccess({
+      id: 'foo-123',
+      name: 'list name',
+    })).toEqual(expected);
   });
 
   it('should create action for list not read successfully', () => {
@@ -118,7 +128,9 @@ describe('List reducer', () => {
   it('should handle CREATE_LIST', () => {
     const action = {
       type: List.CREATE_LIST,
-      payload: {},
+      payload: {
+        name: 'list name',
+      },
     };
 
     const expected = {
@@ -136,12 +148,14 @@ describe('List reducer', () => {
       type: List.CREATE_LIST_SUCCESS,
       payload: {
         id: '-foobar',
+        name: 'list name',
       },
     };
 
     const expected = {
       ...List.initialState,
       id: '-foobar',
+      name: 'list name',
     };
 
     expect(
@@ -188,12 +202,14 @@ describe('List reducer', () => {
       type: List.READ_LIST_SUCCESS,
       payload: {
         id: 'foo-123',
+        name: 'list name',
       },
     };
 
     const expected = {
       ...List.initialState,
       id: 'foo-123',
+      name: 'list name',
     };
 
     expect(

@@ -28,7 +28,7 @@ export class List extends Component {
     bindWatchers(id, dispatch);
   };
 
-  renderHeader = (): ?React$Element<any> => {
+  maybeRenderHeader = (): ?React$Element<any> => {
     const { isLoading } = this.props;
 
     if (isLoading) {
@@ -45,7 +45,7 @@ export class List extends Component {
   render() {
     return (
       <StickyContainer>
-        {this.renderHeader()}
+        {this.maybeRenderHeader()}
         <p>Here be list content!</p>
         <p>Here be list content!</p>
         <p>Here be list content!</p>

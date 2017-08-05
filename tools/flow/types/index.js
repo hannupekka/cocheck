@@ -38,6 +38,7 @@ declare type NotificationState = {
 declare type ListState = {
   +isLoading: boolean,
   +id: string,
+  +name: string,
   +entities: {
     +items: Object
   },

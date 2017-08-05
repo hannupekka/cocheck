@@ -11,6 +11,16 @@
   padding: @padding 0;
   width: 100% !important;
   border-bottom: 1px solid darken(@color__light, 15%);
+  font-size: 80%;
+}
+
+.name {
+  margin: 0 0 (@padding / 2) 0;
+
+  .sticky & {
+    display: inline;
+    margin: 0 (@padding / 2) 0 0;
+  }
 }
 
 .button {

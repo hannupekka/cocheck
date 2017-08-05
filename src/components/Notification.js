@@ -17,7 +17,7 @@ const Notification: Component<Props> = (props: Props): React$Element<any> => {
     props.onDismiss(notificationId);
   };
 
-  const renderIcon = (): ?React$Element<any> => {
+  const maybeRenderIcon = (): ?React$Element<any> => {
     const icon = props.data.icon;
     if (!icon) {
       return null;
@@ -32,7 +32,7 @@ const Notification: Component<Props> = (props: Props): React$Element<any> => {
     <div styleName={type} onClick={onDismiss} role="button" tabIndex={0}>
       <div styleName="left">
         <div styleName="icon">
-          {renderIcon()}
+          {maybeRenderIcon()}
         </div>
       </div>
       <div styleName="right">
