@@ -10,7 +10,7 @@ const defaultOptions = {
   body: '',
   type: 'success',
   icon: '',
-  timeout: 2000,
+  timeout: 5000,
 };
 
 export const dismissNotification = (notificationId: string): ThunkAction => ({

@@ -76,9 +76,11 @@ export const deleteList = (id: string): ThunkAction => ({
   },
 });
 
-export const deleteListSuccess = (): ThunkAction => ({
+export const deleteListSuccess = (id: string): ThunkAction => ({
   type: DELETE_LIST_SUCCESS,
-  payload: {},
+  payload: {
+    id,
+  },
 });
 
 export const deleteListFailure = (): ThunkAction => ({
@@ -180,7 +182,7 @@ export const readListEpic =
               Observable.of(push('/')),
               Observable.of(showNotification({
                 title: 'Error',
-                body: 'List not found!',
+                body: 'List not found',
                 icon: 'exclamation',
                 type: 'error',
               }))
@@ -194,23 +196,22 @@ export const deleteListEpic =
       .flatMap(action => {
         database.ref('/lists').child(action.payload.id).remove();
 
-        return Observable.concat(
-          Observable.of(hideConfirmation()),
-          Observable.of(deleteListSuccess()),
-          Observable.of(showNotification({
-            title: 'OK',
-            body: 'List deleted!',
-            icon: 'trash',
-            type: 'success',
-          }))
-        );
+        return Observable.of(hideConfirmation());
       })
       .catch(error => Observable.of(handleError(error)));
 
-export const deleteListWatchEpic =
+export const deleteListSuccessEpic =
   (action$: Observable<Action>): Observable<Action> =>
     action$.ofType(DELETE_LIST_SUCCESS)
-      .flatMap(() => Observable.of(push('/')))
+      .flatMap(() => Observable.concat(
+        Observable.of(showNotification({
+          title: 'OK',
+          body: 'List deleted',
+          icon: 'trash',
+          type: 'success',
+        })),
+        Observable.of(push('/'))
+      ))
       .catch(error => Observable.of(handleError(error)));
 
 export const handleErrorEpic =

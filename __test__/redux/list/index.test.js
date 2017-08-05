@@ -92,10 +92,12 @@ describe('List actions', () => {
   it('should create action for list deleted successfully', () => {
     const expected = {
       type: List.DELETE_LIST_SUCCESS,
-      payload: {},
+      payload: {
+        id: 'foo-123',
+      },
     };
 
-    expect(List.deleteListSuccess()).toEqual(expected);
+    expect(List.deleteListSuccess('foo-123')).toEqual(expected);
   });
 
   it('should create action for list not deleted successfully', () => {
