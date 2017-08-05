@@ -43,9 +43,7 @@ export const createListSuccess = (id: string): ThunkAction => ({
 
 export const createListFailure = (): ThunkAction => ({
   type: CREATE_LIST_FAILURE,
-  payload: {
-    errorMessage: 'Could not create new list',
-  },
+  payload: {},
 });
 
 export const readList = (id: string): ThunkAction => ({
@@ -64,9 +62,7 @@ export const readListSuccess = (id: string): ThunkAction => ({
 
 export const readListFailure = (): ThunkAction => ({
   type: READ_LIST_FAILURE,
-  payload: {
-    errorMessage: 'Could not read list',
-  },
+  payload: {},
 });
 
 export const deleteList = (id: string): ThunkAction => ({
@@ -83,9 +79,7 @@ export const deleteListSuccess = (): ThunkAction => ({
 
 export const deleteListFailure = (): ThunkAction => ({
   type: DELETE_LIST_FAILURE,
-  payload: {
-    errorMessage: 'Could not delete list',
-  },
+  payload: {},
 });
 
 // export const addItem = ({ name, checked }: { name: string, checked: boolean }): ThunkAction => ({
@@ -215,8 +209,6 @@ export const handleErrorEpic =
 
 export const initialState: ListState = {
   isLoading: false,
-  isError: false,
-  errorMessage: '',
   id: '',
   entities: {
     items: {},
@@ -244,21 +236,14 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
         id: action.payload.id,
       };
     case DELETE_LIST_SUCCESS:
-    case HANDLE_ERROR:
-      return initialState;
     case CREATE_LIST_FAILURE:
     case READ_LIST_FAILURE:
-      return {
-        ...initialState,
-        isError: true,
-        errorMessage: action.payload.errorMessage,
-      };
+    case HANDLE_ERROR:
+      return initialState;
     case DELETE_LIST_FAILURE:
       return {
         ...state,
         isLoading: false,
-        isError: true,
-        errorMessage: action.payload.errorMessage,
       };
     default:
       return state;

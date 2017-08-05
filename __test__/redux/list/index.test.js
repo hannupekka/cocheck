@@ -31,9 +31,7 @@ describe('List actions', () => {
   it('should create action for list not created successfully', () => {
     const expected = {
       type: List.CREATE_LIST_FAILURE,
-      payload: {
-        errorMessage: 'Could not create new list',
-      },
+      payload: {},
     };
 
     expect(List.createListFailure()).toEqual(expected);
@@ -64,9 +62,7 @@ describe('List actions', () => {
   it('should create action for list not read successfully', () => {
     const expected = {
       type: List.READ_LIST_FAILURE,
-      payload: {
-        errorMessage: 'Could not read list',
-      },
+      payload: {},
     };
 
     expect(List.readListFailure()).toEqual(expected);
@@ -95,9 +91,7 @@ describe('List actions', () => {
   it('should create action for list not deleted successfully', () => {
     const expected = {
       type: List.DELETE_LIST_FAILURE,
-      payload: {
-        errorMessage: 'Could not delete list',
-      },
+      payload: {},
     };
 
     expect(List.deleteListFailure()).toEqual(expected);
@@ -158,20 +152,12 @@ describe('List reducer', () => {
   it('should handle CREATE_LIST_FAILURE', () => {
     const action = {
       type: List.CREATE_LIST_FAILURE,
-      payload: {
-        errorMessage: 'Could not create new list',
-      },
-    };
-
-    const expected = {
-      ...List.initialState,
-      isError: true,
-      errorMessage: 'Could not create new list',
+      payload: {},
     };
 
     expect(
       reducer(List.initialState, action)
-    ).toEqual(expected);
+    ).toEqual(List.initialState);
   });
 
   it('should handle READ_LIST', () => {
@@ -223,20 +209,12 @@ describe('List reducer', () => {
 
     const action = {
       type: List.READ_LIST_FAILURE,
-      payload: {
-        errorMessage: 'Could not read list',
-      },
-    };
-
-    const expected = {
-      ...List.initialState,
-      isError: true,
-      errorMessage: 'Could not read list',
+      payload: {},
     };
 
     expect(
       reducer(initialState, action)
-    ).toEqual(expected);
+    ).toEqual(List.initialState);
   });
 
   it('should handle DELETE_LIST', () => {
@@ -288,16 +266,12 @@ describe('List reducer', () => {
 
     const action = {
       type: List.DELETE_LIST_FAILURE,
-      payload: {
-        errorMessage: 'Could not delete list',
-      },
+      payload: {},
     };
 
     const expected = {
       ...initialState,
       isLoading: false,
-      isError: true,
-      errorMessage: 'Could not delete list',
     };
 
     expect(
