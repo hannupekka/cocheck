@@ -9,6 +9,7 @@ import list, {
   readListEpic,
   deleteListEpic,
   deleteListSuccessEpic,
+  addItemEpic,
   handleErrorEpic,
 } from 'redux/list';
 
@@ -24,5 +25,6 @@ export const rootEpic = combineEpics(
   readListEpic,
   deleteListEpic,
   deleteListSuccessEpic,
+  addItemEpic,
   handleErrorEpic
 );

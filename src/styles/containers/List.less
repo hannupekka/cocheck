@@ -1,1 +1,21 @@
 @import '~styles/main';
+
+.input__wrapper {
+  margin: @padding 0;
+  text-align: center;
+}
+
+.input {
+  composes: base__input;
+  width: 50%;
+}
+
+.wrapper {
+  width: 50%;
+  margin: 0 auto;
+}
+
+.wrapper--empty {
+  composes: wrapper;
+  text-align: center;
+}

@@ -1,6 +1,5 @@
 // @flow
 import { Observable, Action } from 'rxjs';
-// import cuid from 'cuid';
 import { push } from 'react-router-redux'
 import database from 'utils/database';
 import { hideConfirmation } from 'redux/confirm';
@@ -13,6 +12,7 @@ export const CREATE_LIST_FAILURE = 'cocheck/list/CREATE_LIST_FAILURE';
 export const READ_LIST = 'cocheck/list/READ_LIST';
 export const READ_LIST_SUCCESS = 'cocheck/list/READ_LIST_SUCCESS';
 export const READ_LIST_FAILURE = 'cocheck/list/READ_LIST_FAILURE';
+export const READ_LIST_ITEMS_SUCCESS = 'cocheck/list/READ_LIST_ITEMS_SUCCESS';
 
 export const DELETE_LIST = 'cocheck/list/DELETE_LIST';
 export const DELETE_LIST_SUCCESS = 'cocheck/list/DELETE_LIST_SUCCESS';
@@ -20,7 +20,10 @@ export const DELETE_LIST_FAILURE = 'cocheck/list/DELETE_LIST_FAILURE';
 
 export const HANDLE_ERROR = 'cocheck/list/HANDLE_ERROR';
 
-// export const ADD_ITEM = 'cocheck/list/ADD_ITEM';
+export const ADD_ITEM = 'cocheck/list/ADD_ITEM';
+export const ADD_ITEM_SUCCESS = 'cocheck/list/ADD_ITEM_SUCCESS';
+export const ADD_ITEM_FAILURE = 'cocheck/list/ADD_ITEM_FAILURE';
+
 // export const EDIT_ITEM = 'cocheck/list/EDIT_ITEM';
 // export const CHECK_ITEM = 'cocheck/list/CHECK_ITEM';
 // export const UNCHECK_ITEM = 'cocheck/list/UNCHECK_ITEM';
@@ -69,6 +72,15 @@ export const readListFailure = (): ThunkAction => ({
   payload: {},
 });
 
+export const readListItemsSuccess =
+  ({ entities, result }: { entities: { items: Object }, result: Array<string> }): ThunkAction => ({
+    type: READ_LIST_ITEMS_SUCCESS,
+    payload: {
+      entities,
+      result,
+    },
+  });
+
 export const deleteList = (id: string): ThunkAction => ({
   type: DELETE_LIST,
   payload: {
@@ -76,11 +88,9 @@ export const deleteList = (id: string): ThunkAction => ({
   },
 });
 
-export const deleteListSuccess = (id: string): ThunkAction => ({
+export const deleteListSuccess = (): ThunkAction => ({
   type: DELETE_LIST_SUCCESS,
-  payload: {
-    id,
-  },
+  payload: {},
 });
 
 export const deleteListFailure = (): ThunkAction => ({
@@ -88,14 +98,23 @@ export const deleteListFailure = (): ThunkAction => ({
   payload: {},
 });
 
-// export const addItem = ({ name, checked }: { name: string, checked: boolean }): ThunkAction => ({
-//   type: ADD_ITEM,
-//   payload: {
-//     id: cuid(),
-//     name,
-//     checked,
-//   },
-// });
+export const addItem = ({ name, listId }: { name: string, listId: string }): ThunkAction => ({
+  type: ADD_ITEM,
+  payload: {
+    name,
+    listId,
+  },
+});
+
+export const addItemSuccess = (): ThunkAction => ({
+  type: ADD_ITEM_SUCCESS,
+  payload: {},
+});
+
+export const addItemFailure = (): ThunkAction => ({
+  type: ADD_ITEM_FAILURE,
+  payload: {},
+});
 
 // export const editItem = (name: string): ThunkAction => ({
 //   type: EDIT_ITEM,
@@ -166,17 +185,19 @@ export const readListEpic =
     action$.ofType(READ_LIST)
       .flatMap(action => {
         const listRef = database.ref('/lists').child(action.payload.id);
+
         return Observable.fromPromise(listRef.once('value'));
       })
-      .flatMap(snapshot => {
-        const list = snapshot.val();
+      .flatMap(listRef => {
+        const list = listRef.val();
+
         const listExists = list !== null;
 
         return listExists
           ? Observable.of(readListSuccess({
-            id: snapshot.key,
-            name: list.name,
-          }))
+              id: listRef.key,
+              name: list.name,
+            }))
           : Observable.concat(
               Observable.of(readListFailure()),
               Observable.of(push('/')),
@@ -214,6 +235,21 @@ export const deleteListSuccessEpic =
       ))
       .catch(error => Observable.of(handleError(error)));
 
+export const addItemEpic = (action$: Observable<Action>): Observable<Action> =>
+  action$.ofType(ADD_ITEM)
+    .flatMap(action => {
+      const { name, listId } = action.payload;
+
+      const itemsRef = database.ref('/items');
+      itemsRef.push({
+        name,
+        listId,
+      });
+
+      return Observable.of(addItemSuccess());
+    })
+    .catch(error => Observable.of(handleError(error)));
+
 export const handleErrorEpic =
   (action$: Observable<Action>): Observable<Action> =>
     action$.ofType(HANDLE_ERROR)
@@ -241,6 +277,7 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
         ...initialState,
         isLoading: true,
       };
+    case ADD_ITEM:
     case DELETE_LIST:
       return {
         ...state,
@@ -253,11 +290,19 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
         id: action.payload.id,
         name: action.payload.name,
       };
+    case READ_LIST_ITEMS_SUCCESS:
+      return {
+        ...state,
+        entities: action.payload.entities,
+        result: action.payload.result,
+      };
     case DELETE_LIST_SUCCESS:
     case CREATE_LIST_FAILURE:
     case READ_LIST_FAILURE:
     case HANDLE_ERROR:
       return initialState;
+    case ADD_ITEM_SUCCESS:
+    case ADD_ITEM_FAILURE:
     case DELETE_LIST_FAILURE:
       return {
         ...state,
