@@ -3,10 +3,12 @@ import styles from 'styles/containers/List.less';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { StickyContainer, Sticky } from 'react-sticky';
+import { arrayMove } from 'react-sortable-hoc';
 import CSSModules from 'react-css-modules';
 import ListHeader from 'containers/ListHeader';
+import ListItems from 'components/ListItems';
 import { bindWatchers, removeWatchers } from 'utils/watchers';
-import { readList, addItem } from 'redux/list';
+import { readList, addItem, sortItems } from 'redux/list';
 import getItems from 'redux/list/selectors';
 
 type Props = {
@@ -57,14 +59,32 @@ export class List extends Component {
     if (name !== '') {
       this.itemInput.value = '';
 
+      const index = items.length > 0 ? Math.max(...items.map(item => item.index)) + 1 : 0;
+
       dispatch(
         addItem({
           name,
-          index: Math.max(...items.map(item => item.index)) + 1,
+          index,
           listId: id,
         })
       );
     }
+  };
+
+  onSortEnd = (props: Object): void => {
+    const { items, id, dispatch } = this.props;
+
+    const newItems = arrayMove(items, props.oldIndex, props.newIndex).map((item, index) => ({
+      ...item,
+      index,
+    }));
+
+    dispatch(
+      sortItems({
+        items: newItems,
+        listId: id,
+      })
+    );
   };
 
   maybeRenderHeader = (): ?React$Element<any> => {
@@ -96,24 +116,10 @@ export class List extends Component {
     const { items, id, isLoading } = this.props;
 
     if (!isLoading && id !== '' && items.length === 0) {
-      return <div styleName="wrapper--empty">No items yet - add some</div>;
+      return <div styleName="empty">No items yet - add some</div>;
     }
 
-    const itemList = items.map(item => {
-      const { name } = item;
-
-      return (
-        <div key={item.id}>
-          {name}
-        </div>
-      );
-    });
-
-    return (
-      <div styleName="wrapper">
-        {itemList}
-      </div>
-    );
+    return <ListItems items={items} onSortEnd={this.onSortEnd} lockAxis="y" />;
   };
 
   render() {

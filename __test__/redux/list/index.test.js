@@ -162,6 +162,48 @@ describe('List actions', () => {
     expect(List.addItemFailure()).toEqual(expected);
   });
 
+  it('should create an action for sorting items', () => {
+    const items = [
+      {
+        id: 'foo1',
+        name: 'first',
+        index: 0,
+      }, {
+        id: 'foo2',
+        name: 'second',
+        index: 1,
+      },
+    ];
+
+    const expected = {
+      type: List.SORT_ITEMS,
+      payload: {
+        items,
+        listId: 'foo123',
+      },
+    };
+
+    expect(List.sortItems({ items, listId: 'foo123' })).toEqual(expected);
+  });
+
+  it('should create an action for successfully sorted items', () => {
+    const expected = {
+      type: List.SORT_ITEMS_SUCCESS,
+      payload: {},
+    };
+
+    expect(List.sortItemsSuccess()).toEqual(expected);
+  });
+
+  it('should create an action for successfully sorted items', () => {
+    const expected = {
+      type: List.SORT_ITEMS_FAILURE,
+      payload: {},
+    };
+
+    expect(List.sortItemsFailure()).toEqual(expected);
+  });
+
   it('should create action to handle error', () => {
     const error = new Error('error');
     const expected = {
@@ -444,6 +486,91 @@ describe('List reducer', () => {
     expect(
       reducer(initialState, action)
     ).toEqual(initialState);
+  });
+
+  it('should handle SORT_ITEMS', () => {
+    const items = [
+      {
+        id: 'foo1',
+        name: 'first',
+        index: 0,
+      },
+      {
+        id: 'foo2',
+        name: 'second',
+        index: 1,
+      },
+    ];
+
+    const initialState = {
+      ...List.initialState,
+      id: 'foo123',
+      name: 'foolist',
+      items,
+    };
+
+    const action = {
+      type: List.SORT_ITEMS,
+      payload: {
+        items,
+        listId: 'foo123',
+      },
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: true,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle SORT_ITEMS_SUCCES', () => {
+    const initialState = {
+      ...List.initialState,
+      id: 'foo123',
+      name: 'foolist',
+      isLoading: true,
+    };
+
+    const action = {
+      type: List.SORT_ITEMS_SUCCESS,
+      payload: {},
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: false,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle SORT_ITEMS_FAILURE', () => {
+    const initialState = {
+      ...List.initialState,
+      id: 'foo123',
+      name: 'foolist',
+      isLoading: true,
+    };
+
+    const action = {
+      type: List.SORT_ITEMS_FAILURE,
+      payload: {},
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: false,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
   });
 
   it('should handle HANDLE_ERROR', () => {

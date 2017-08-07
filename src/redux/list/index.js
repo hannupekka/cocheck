@@ -24,6 +24,10 @@ export const ADD_ITEM = 'cocheck/list/ADD_ITEM';
 export const ADD_ITEM_SUCCESS = 'cocheck/list/ADD_ITEM_SUCCESS';
 export const ADD_ITEM_FAILURE = 'cocheck/list/ADD_ITEM_FAILURE';
 
+export const SORT_ITEMS = 'cocheck/list/SORT_ITEMS';
+export const SORT_ITEMS_SUCCESS = 'cocheck/list/SORT_ITEMS_SUCCESS';
+export const SORT_ITEMS_FAILURE = 'cocheck/list/SORT_ITEMS_FAILURE';
+
 // export const EDIT_ITEM = 'cocheck/list/EDIT_ITEM';
 // export const CHECK_ITEM = 'cocheck/list/CHECK_ITEM';
 // export const UNCHECK_ITEM = 'cocheck/list/UNCHECK_ITEM';
@@ -113,6 +117,25 @@ export const addItemSuccess = (): ThunkAction => ({
 
 export const addItemFailure = (): ThunkAction => ({
   type: ADD_ITEM_FAILURE,
+  payload: {},
+});
+
+export const sortItems =
+  ({ items, listId }: {items: Array<Item>, listId: string} ): ThunkAction => ({
+    type: SORT_ITEMS,
+    payload: {
+      items,
+      listId,
+    },
+  });
+
+export const sortItemsSuccess = (): ThunkAction => ({
+  type: SORT_ITEMS_SUCCESS,
+  payload: {},
+});
+
+export const sortItemsFailure = (): ThunkAction => ({
+  type: SORT_ITEMS_FAILURE,
   payload: {},
 });
 
@@ -240,13 +263,32 @@ export const addItemEpic = (action$: Observable<Action>): Observable<Action> =>
     .flatMap(action => {
       const { name, index, listId } = action.payload;
 
-      const itemsRef = database.ref(`/items/${listId}`)
+      const itemsRef = database.ref(`/items/${listId}`);
       itemsRef.push({
         name,
         index,
       });
 
       return Observable.of(addItemSuccess());
+    })
+    .catch(error => Observable.of(handleError(error)));
+
+export const sortItemsEpic = (action$: Observable<Action>): Observable<Action> =>
+  action$.ofType(SORT_ITEMS)
+    .flatMap(action => {
+      const { items, listId } = action.payload;
+
+      const updates = {};
+
+      items.forEach(item => {
+        updates[item.id] = {
+          index: item.index,
+          name: item.name,
+        };
+      });
+
+      database.ref(`/items/${listId}`).update(updates);
+      return Observable.of(sortItemsSuccess());
     })
     .catch(error => Observable.of(handleError(error)));
 
@@ -275,6 +317,7 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
         isLoading: true,
       };
     case ADD_ITEM:
+    case SORT_ITEMS:
     case DELETE_LIST:
       return {
         ...state,
@@ -299,6 +342,8 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
       return initialState;
     case ADD_ITEM_SUCCESS:
     case ADD_ITEM_FAILURE:
+    case SORT_ITEMS_SUCCESS:
+    case SORT_ITEMS_FAILURE:
     case DELETE_LIST_FAILURE:
       return {
         ...state,
