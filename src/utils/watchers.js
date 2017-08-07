@@ -1,9 +1,6 @@
 // @flow
-import R from 'ramda';
-import { normalize } from 'normalizr';
 import database from 'utils/database';
 import { deleteListSuccess, readListItemsSuccess } from 'redux/list';
-import * as Schemas from 'redux/list/schemas';
 
 export const bindWatchers = (id: string, dispatch: Function): void => {
   database.ref('/lists').orderByKey().equalTo(id).on('child_removed', () => {
@@ -20,23 +17,16 @@ export const bindWatchers = (id: string, dispatch: Function): void => {
     });
   });
 
-  database.ref('/items').orderByChild('listId').equalTo(id).on('value', itemsRef => {
-    const items = R.mapObjIndexed(
-      (item, key) => ({
-        ...item,
-        id: key,
-      }),
-      itemsRef.val()
-    );
+  database.ref(`/items/${id}`).orderByChild('index').on('value', itemsRef => {
+    const items = [];
+    itemsRef.forEach(item => {
+      items.push({
+        ...item.val(),
+        id: item.key,
+      });
+    });
 
-    const { entities, result } = normalize(items, Schemas.items);
-
-    dispatch(
-      readListItemsSuccess({
-        entities: Object.keys(items).length > 0 ? entities : { items: {} },
-        result,
-      })
-    );
+    dispatch(readListItemsSuccess(items));
   });
 };
 

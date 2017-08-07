@@ -36,6 +36,8 @@ declare type NotificationState = {
 }
 
 declare type Item = {|
+  id: string,
+  index: number,
   name: string
 |}
 
@@ -43,10 +45,7 @@ declare type ListState = {
   +isLoading: boolean,
   +id: string,
   +name: string,
-  +entities: {
-    +items: Object
-  },
-  +result: Array<string>
+  +items: Array<Item>
 }
 
 declare type RootState = {

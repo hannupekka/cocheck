@@ -79,31 +79,27 @@ describe('List actions', () => {
   });
 
   it('should create action to read list items successfully', () => {
-    const entities = {
-      items: {
-        'abc123': {
-          name: 'foo',
-        },
-        'xyz456': {
-          name: 'bar',
-        },
+    const items = [
+      {
+        name: 'foo',
+        index: 0,
+        listId: 'foo123',
       },
-    };
-
-    const result = [
-      'abc123',
-      'xyz456',
+      {
+        name: 'bar',
+        index: 1,
+        listId: 'foo123',
+      },
     ];
 
     const expected = {
       type: List.READ_LIST_ITEMS_SUCCESS,
       payload: {
-        entities,
-        result,
+        items,
       },
     };
 
-    expect(List.readListItemsSuccess({ entities, result })).toEqual(expected);
+    expect(List.readListItemsSuccess(items)).toEqual(expected);
   });
 
   it('should create action to delete list', () => {
@@ -140,11 +136,12 @@ describe('List actions', () => {
       type: List.ADD_ITEM,
       payload: {
         name: 'foo',
+        index: 0,
         listId: 'foo123',
       },
     };
 
-    expect(List.addItem({ name: 'foo', listId: 'foo123'})).toEqual(expected);
+    expect(List.addItem({ name: 'foo', index: 0, listId: 'foo123'})).toEqual(expected);
   });
 
   it('should create an action for item added successfully', () => {
@@ -298,34 +295,29 @@ describe('List reducer', () => {
       name: 'foolist',
     };
 
-    const entities = {
-      items: {
-        'abc123': {
-          name: 'foo',
-        },
-        'xyz456': {
-          name: 'bar',
-        },
+    const items = [
+      {
+        name: 'foo',
+        index: 0,
+        listId: 'foo123',
       },
-    };
-
-    const result = [
-      'abc123',
-      'xyz456',
+      {
+        name: 'bar',
+        index: 1,
+        listId: 'foo123',
+      },
     ];
 
     const action = {
       type: List.READ_LIST_ITEMS_SUCCESS,
       payload: {
-        entities,
-        result,
+        items,
       },
     };
 
     const expected = {
       ...initialState,
-      entities,
-      result,
+      items,
     };
 
     expect(

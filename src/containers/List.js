@@ -3,7 +3,6 @@ import styles from 'styles/containers/List.less';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { StickyContainer, Sticky } from 'react-sticky';
-import R from 'ramda';
 import CSSModules from 'react-css-modules';
 import ListHeader from 'containers/ListHeader';
 import { bindWatchers, removeWatchers } from 'utils/watchers';
@@ -14,7 +13,7 @@ type Props = {
   dispatch: Function,
   match: Object,
   id: string,
-  items: Object,
+  items: Array<Item>,
   isLoading: boolean,
 };
 
@@ -52,16 +51,20 @@ export class List extends Component {
   };
 
   onAddItem = (): void => {
-    const { dispatch, id } = this.props;
-    const item = this.itemInput.value;
-    this.itemInput.value = '';
+    const { dispatch, id, items } = this.props;
+    const name = this.itemInput.value;
 
-    dispatch(
-      addItem({
-        name: item,
-        listId: id,
-      })
-    );
+    if (name !== '') {
+      this.itemInput.value = '';
+
+      dispatch(
+        addItem({
+          name,
+          index: Math.max(...items.map(item => item.index)) + 1,
+          listId: id,
+        })
+      );
+    }
   };
 
   maybeRenderHeader = (): ?React$Element<any> => {
@@ -92,22 +95,19 @@ export class List extends Component {
   maybeRenderItems = (): ?React$Element<any> => {
     const { items, id, isLoading } = this.props;
 
-    if (!isLoading && id !== '' && Object.keys(items).length === 0) {
+    if (!isLoading && id !== '' && items.length === 0) {
       return <div styleName="wrapper--empty">No items yet - add some</div>;
     }
 
-    const itemList = R.compose(
-      R.values,
-      R.mapObjIndexed((item, key) => {
-        const { name } = item;
+    const itemList = items.map(item => {
+      const { name } = item;
 
-        return (
-          <div key={key}>
-            {name}
-          </div>
-        );
-      })
-    )(items);
+      return (
+        <div key={item.id}>
+          {name}
+        </div>
+      );
+    });
 
     return (
       <div styleName="wrapper">
@@ -129,7 +129,7 @@ export class List extends Component {
 
 type MappedState = {
   id: string,
-  items: Object,
+  items: Array<Item>,
   isLoading: boolean,
 };
 

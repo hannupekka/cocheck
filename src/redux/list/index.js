@@ -72,12 +72,10 @@ export const readListFailure = (): ThunkAction => ({
   payload: {},
 });
 
-export const readListItemsSuccess =
-  ({ entities, result }: { entities: { items: Object }, result: Array<string> }): ThunkAction => ({
+export const readListItemsSuccess = (items: Array<Item>): ThunkAction => ({
     type: READ_LIST_ITEMS_SUCCESS,
     payload: {
-      entities,
-      result,
+      items,
     },
   });
 
@@ -98,13 +96,15 @@ export const deleteListFailure = (): ThunkAction => ({
   payload: {},
 });
 
-export const addItem = ({ name, listId }: { name: string, listId: string }): ThunkAction => ({
-  type: ADD_ITEM,
-  payload: {
-    name,
-    listId,
-  },
-});
+export const addItem =
+  ({ name, index, listId }: { name: string, index: number, listId: string }): ThunkAction => ({
+    type: ADD_ITEM,
+    payload: {
+      name,
+      index,
+      listId,
+    },
+  });
 
 export const addItemSuccess = (): ThunkAction => ({
   type: ADD_ITEM_SUCCESS,
@@ -238,12 +238,12 @@ export const deleteListSuccessEpic =
 export const addItemEpic = (action$: Observable<Action>): Observable<Action> =>
   action$.ofType(ADD_ITEM)
     .flatMap(action => {
-      const { name, listId } = action.payload;
+      const { name, index, listId } = action.payload;
 
-      const itemsRef = database.ref('/items');
+      const itemsRef = database.ref(`/items/${listId}`)
       itemsRef.push({
         name,
-        listId,
+        index,
       });
 
       return Observable.of(addItemSuccess());
@@ -263,10 +263,7 @@ export const initialState: ListState = {
   isLoading: false,
   id: '',
   name: '',
-  entities: {
-    items: {},
-  },
-  result: [],
+  items: [],
 };
 
 export default function reducer(state: ListState = initialState, action: ThunkAction): ListState {
@@ -293,8 +290,7 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
     case READ_LIST_ITEMS_SUCCESS:
       return {
         ...state,
-        entities: action.payload.entities,
-        result: action.payload.result,
+        items: action.payload.items,
       };
     case DELETE_LIST_SUCCESS:
     case CREATE_LIST_FAILURE:
