@@ -1,9 +1,68 @@
 @import '~styles/main';
 
 .item {
-  padding: (@padding / 2) 0;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid @color__border;
+  user-select: none;
+
+  & + & {
+    border-top: none;
+  }
+}
+
+.icon {
+  padding: @padding--half;
+  opacity: 0.5;
+  transition: 0.1s opacity linear;
 
   &:hover {
     cursor: pointer;
   }
+
+  .item:hover & {
+    opacity: 1;
+  }
+}
+
+.handle {
+  composes: icon;
+  &:hover {
+    cursor: row-resize;
+  }
+}
+
+.name {
+  padding: @padding--half 0 @padding--half @padding--half;
+  flex: 1;
+}
+
+.display {
+  composes: base__input;
+  border: none;
+  padding: 0;
+}
+
+.edit {
+  composes: base__input;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  padding-left: 0;
+  padding-right: 0;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.check {
+  composes: icon;
+  font-size: 150%;
+}
+
+.delete {
+  composes: icon;
 }

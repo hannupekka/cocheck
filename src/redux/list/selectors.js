@@ -1,7 +1,7 @@
 // @flow
 import { createSelector } from 'reselect';
 
-const getItems = (state: RootState): Array<Item> => state.list.items;
+const getItems = (state: RootState): Array<Item> => state.list.listItems;
 
 export default createSelector(
   [getItems],

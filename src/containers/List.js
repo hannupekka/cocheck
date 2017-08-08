@@ -6,7 +6,7 @@ import { StickyContainer, Sticky } from 'react-sticky';
 import { arrayMove } from 'react-sortable-hoc';
 import CSSModules from 'react-css-modules';
 import ListHeader from 'containers/ListHeader';
-import ListItems from 'components/ListItems';
+import ListItems from 'containers/ListItems';
 import { bindWatchers, removeWatchers } from 'utils/watchers';
 import { readList, addItem, sortItems } from 'redux/list';
 import getItems from 'redux/list/selectors';
@@ -14,8 +14,8 @@ import getItems from 'redux/list/selectors';
 type Props = {
   dispatch: Function,
   match: Object,
-  id: string,
-  items: Array<Item>,
+  listId: string,
+  listItems: Array<Item>,
   isLoading: boolean,
 };
 
@@ -33,13 +33,13 @@ export class List extends Component {
 
   componentWillMount = (): void => {
     const { dispatch, match } = this.props;
-    const id = match.params[0];
+    const listId = match.params[0];
 
     // Get list ID from router params.
-    dispatch(readList(id));
+    dispatch(readList(listId));
 
     // Bind Firebase watchers.
-    bindWatchers(id, dispatch);
+    bindWatchers(listId, dispatch);
   };
 
   componentWillUnmount = (): void => {
@@ -53,44 +53,44 @@ export class List extends Component {
   };
 
   onAddItem = (): void => {
-    const { dispatch, id, items } = this.props;
+    const { dispatch, listId, listItems } = this.props;
     const name = this.itemInput.value;
 
     if (name !== '') {
       this.itemInput.value = '';
 
-      const index = items.length > 0 ? Math.max(...items.map(item => item.index)) + 1 : 0;
+      const index = listItems.length > 0 ? Math.max(...listItems.map(item => item.index)) + 1 : 0;
 
       dispatch(
         addItem({
           name,
           index,
-          listId: id,
+          listId,
         })
       );
     }
   };
 
   onSortEnd = (props: Object): void => {
-    const { items, id, dispatch } = this.props;
+    const { listItems, listId, dispatch } = this.props;
 
-    const newItems = arrayMove(items, props.oldIndex, props.newIndex).map((item, index) => ({
+    const newItems = arrayMove(listItems, props.oldIndex, props.newIndex).map((item, index) => ({
       ...item,
       index,
     }));
 
     dispatch(
       sortItems({
-        items: newItems,
-        listId: id,
+        listItems: newItems,
+        listId,
       })
     );
   };
 
   maybeRenderHeader = (): ?React$Element<any> => {
-    const { isLoading, id } = this.props;
+    const { isLoading, listId } = this.props;
 
-    if (isLoading && id === '') {
+    if (isLoading && listId === '') {
       return null;
     }
 
@@ -113,13 +113,22 @@ export class List extends Component {
     </div>;
 
   maybeRenderItems = (): ?React$Element<any> => {
-    const { items, id, isLoading } = this.props;
+    const { listItems, listId, isLoading } = this.props;
 
-    if (!isLoading && id !== '' && items.length === 0) {
+    if (!isLoading && listId !== '' && listItems.length === 0) {
       return <div styleName="empty">No items yet - add some</div>;
     }
 
-    return <ListItems items={items} onSortEnd={this.onSortEnd} lockAxis="y" />;
+    return (
+      <ListItems
+        items={listItems}
+        onSortEnd={this.onSortEnd}
+        lockAxis="y"
+        pressDelay={100}
+        lockToContainerEdges
+        useDragHandle
+      />
+    );
   };
 
   render() {
@@ -134,15 +143,15 @@ export class List extends Component {
 }
 
 type MappedState = {
-  id: string,
-  items: Array<Item>,
+  listId: string,
+  listItems: Array<Item>,
   isLoading: boolean,
 };
 
 // eslint-disable-next-line
 const mapState: Function = (state: RootState): MappedState => ({
-  id: state.list.id,
-  items: getItems(state),
+  listId: state.list.listId,
+  listItems: getItems(state),
   isLoading: state.list.isLoading,
 });
 

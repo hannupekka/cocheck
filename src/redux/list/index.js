@@ -28,7 +28,10 @@ export const SORT_ITEMS = 'cocheck/list/SORT_ITEMS';
 export const SORT_ITEMS_SUCCESS = 'cocheck/list/SORT_ITEMS_SUCCESS';
 export const SORT_ITEMS_FAILURE = 'cocheck/list/SORT_ITEMS_FAILURE';
 
-// export const EDIT_ITEM = 'cocheck/list/EDIT_ITEM';
+export const EDIT_ITEM = 'cocheck/list/EDIT_ITEM';
+export const EDIT_ITEM_SUCCESS = 'cocheck/list/EDIT_ITEM_SUCCESS';
+export const EDIT_ITEM_FAILURE = 'cocheck/list/EDIT_ITEM_FAILURE';
+
 // export const CHECK_ITEM = 'cocheck/list/CHECK_ITEM';
 // export const UNCHECK_ITEM = 'cocheck/list/UNCHECK_ITEM';
 // export const REMOVE_ITEM = 'cocheck/list/REMOVE_ITEM';
@@ -36,57 +39,59 @@ export const SORT_ITEMS_FAILURE = 'cocheck/list/SORT_ITEMS_FAILURE';
 // export const CHECK_ALL = 'cocheck/list/CHECK_ALL';
 // export const UNCHECK_ALL = 'cocheck/list/UNCHECK_ALL';
 
-export const createList = (name: string): ThunkAction => ({
+export const createList = (listName: string): ThunkAction => ({
   type: CREATE_LIST,
   payload: {
-    name,
+    listName,
   },
 });
 
-export const createListSuccess = ({ id, name }: { id: string, name: string }): ThunkAction => ({
-  type: CREATE_LIST_SUCCESS,
-  payload: {
-    id,
-    name,
-  },
-});
+export const createListSuccess =
+  ({ listId, listName }: { listId: string, listName: string }): ThunkAction => ({
+    type: CREATE_LIST_SUCCESS,
+    payload: {
+      listId,
+      listName,
+    },
+  });
 
 export const createListFailure = (): ThunkAction => ({
   type: CREATE_LIST_FAILURE,
   payload: {},
 });
 
-export const readList = (id: string): ThunkAction => ({
+export const readList = (listId: string): ThunkAction => ({
   type: READ_LIST,
   payload: {
-    id,
+    listId,
   },
 });
 
-export const readListSuccess = ({ id, name }: { id: string, name: string }): ThunkAction => ({
-  type: READ_LIST_SUCCESS,
-  payload: {
-    id,
-    name,
-  },
-});
+export const readListSuccess =
+  ({ listId, listName }: { listId: string, listName: string }): ThunkAction => ({
+    type: READ_LIST_SUCCESS,
+    payload: {
+      listId,
+      listName,
+    },
+  });
 
 export const readListFailure = (): ThunkAction => ({
   type: READ_LIST_FAILURE,
   payload: {},
 });
 
-export const readListItemsSuccess = (items: Array<Item>): ThunkAction => ({
+export const readListItemsSuccess = (listItems: Array<Item>): ThunkAction => ({
     type: READ_LIST_ITEMS_SUCCESS,
     payload: {
-      items,
+      listItems,
     },
   });
 
-export const deleteList = (id: string): ThunkAction => ({
+export const deleteList = (listId: string): ThunkAction => ({
   type: DELETE_LIST,
   payload: {
-    id,
+    listId,
   },
 });
 
@@ -121,10 +126,10 @@ export const addItemFailure = (): ThunkAction => ({
 });
 
 export const sortItems =
-  ({ items, listId }: {items: Array<Item>, listId: string} ): ThunkAction => ({
+  ({ listItems, listId }: { listItems: Array<Item>, listId: string }): ThunkAction => ({
     type: SORT_ITEMS,
     payload: {
-      items,
+      listItems,
       listId,
     },
   });
@@ -139,12 +144,25 @@ export const sortItemsFailure = (): ThunkAction => ({
   payload: {},
 });
 
-// export const editItem = (name: string): ThunkAction => ({
-//   type: EDIT_ITEM,
-//   payload: {
-//     name,
-//   },
-// });
+export const editItem =
+  ({ name, itemId, listId }: { name: string, itemId: string, listId: string }): ThunkAction => ({
+    type: EDIT_ITEM,
+    payload: {
+      name,
+      itemId,
+      listId,
+    },
+  });
+
+export const editItemSuccess = (): ThunkAction => ({
+  type: EDIT_ITEM_SUCCESS,
+  payload: {},
+});
+
+export const editItemFailure = (): ThunkAction => ({
+  type: EDIT_ITEM_FAILURE,
+  payload: {},
+});
 
 // export const checkItem = (id: string): ThunkAction => ({
 //   type: CHECK_ITEM,
@@ -191,14 +209,15 @@ export const createListEpic =
           name: action.payload.name,
           created: new Date().toISOString(),
         });
-        const id = list.ref.key;
+        const listId = list.ref.key;
+        const listName = action.payload.name;
 
         return Observable.concat(
           Observable.of(createListSuccess({
-            id,
-            name: action.payload.name,
+            listId,
+            listName,
           })),
-          Observable.of(push(`/list/${id}`))
+          Observable.of(push(`/list/${listId}`))
         );
       })
       .catch(error => Observable.of(handleError(error)));
@@ -207,7 +226,7 @@ export const readListEpic =
   (action$: Observable<Action>): Observable<Action> =>
     action$.ofType(READ_LIST)
       .flatMap(action => {
-        const listRef = database.ref('/lists').child(action.payload.id);
+        const listRef = database.ref('/lists').child(action.payload.listId);
 
         return Observable.fromPromise(listRef.once('value'));
       })
@@ -218,8 +237,8 @@ export const readListEpic =
 
         return listExists
           ? Observable.of(readListSuccess({
-              id: listRef.key,
-              name: list.name,
+              listId: listRef.key,
+              listName: list.name,
             }))
           : Observable.concat(
               Observable.of(readListFailure()),
@@ -238,7 +257,7 @@ export const deleteListEpic =
   (action$: Observable<Action>): Observable<Action> =>
     action$.ofType(DELETE_LIST)
       .flatMap(action => {
-        database.ref('/lists').child(action.payload.id).remove();
+        database.ref('/lists').child(action.payload.listId).remove();
 
         return Observable.of(hideConfirmation());
       })
@@ -273,14 +292,26 @@ export const addItemEpic = (action$: Observable<Action>): Observable<Action> =>
     })
     .catch(error => Observable.of(handleError(error)));
 
+export const editItemEpic = (action$: Observable<Action>): Observable<Action> =>
+  action$.ofType(EDIT_ITEM)
+    .flatMap(action => {
+      const { name, itemId, listId} = action.payload;
+
+      const itemsRef = database.ref(`/items/${listId}/${itemId}`);
+      itemsRef.update({ name });
+
+      return Observable.of(editItemSuccess());
+    })
+    .catch(error => Observable.of(handleError(error)));
+
 export const sortItemsEpic = (action$: Observable<Action>): Observable<Action> =>
   action$.ofType(SORT_ITEMS)
     .flatMap(action => {
-      const { items, listId } = action.payload;
+      const { listItems, listId } = action.payload;
 
       const updates = {};
 
-      items.forEach(item => {
+      listItems.forEach(item => {
         updates[item.id] = {
           index: item.index,
           name: item.name,
@@ -303,9 +334,9 @@ export const handleErrorEpic =
 
 export const initialState: ListState = {
   isLoading: false,
-  id: '',
-  name: '',
-  items: [],
+  listId: '',
+  listName: '',
+  listItems: [],
 };
 
 export default function reducer(state: ListState = initialState, action: ThunkAction): ListState {
@@ -317,6 +348,7 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
         isLoading: true,
       };
     case ADD_ITEM:
+    case EDIT_ITEM:
     case SORT_ITEMS:
     case DELETE_LIST:
       return {
@@ -327,13 +359,13 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
     case READ_LIST_SUCCESS:
       return {
         ...initialState,
-        id: action.payload.id,
-        name: action.payload.name,
+        listId: action.payload.listId,
+        listName: action.payload.listName,
       };
     case READ_LIST_ITEMS_SUCCESS:
       return {
         ...state,
-        items: action.payload.items,
+        listItems: action.payload.listItems,
       };
     case DELETE_LIST_SUCCESS:
     case CREATE_LIST_FAILURE:
@@ -342,6 +374,8 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
       return initialState;
     case ADD_ITEM_SUCCESS:
     case ADD_ITEM_FAILURE:
+    case EDIT_ITEM_SUCCESS:
+    case EDIT_ITEM_FAILURE:
     case SORT_ITEMS_SUCCESS:
     case SORT_ITEMS_FAILURE:
     case DELETE_LIST_FAILURE:

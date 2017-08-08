@@ -9,8 +9,8 @@ import * as ListActions from 'redux/list';
 
 type Props = {
   dispatch: Function,
-  id: string,
-  name: string,
+  listId: string,
+  listName: string,
   isSticky: boolean,
   style: Object,
 };
@@ -32,8 +32,8 @@ export class ListHeader extends Component {
   };
 
   onDeleteListConfirm = (): void => {
-    const { id, dispatch } = this.props;
-    dispatch(ListActions.deleteList(id));
+    const { listId, dispatch } = this.props;
+    dispatch(ListActions.deleteList(listId));
   };
 
   onDeleteListClick = (): void => {
@@ -47,15 +47,15 @@ export class ListHeader extends Component {
   };
 
   maybeRenderListName = (): ?React$Element<any> => {
-    const { name } = this.props;
+    const { listName } = this.props;
 
-    if (name === '') {
+    if (listName === '') {
       return null;
     }
 
     return (
       <div styleName="name">
-        {name}
+        {listName}
       </div>
     );
   };
@@ -77,14 +77,14 @@ export class ListHeader extends Component {
 }
 
 type MappedState = {
-  id: string,
-  name: string,
+  listId: string,
+  listName: string,
 };
 
 // eslint-disable-next-line
 const mapState: Function = (state: RootState): MappedState => ({
-  id: state.list.id,
-  name: state.list.name,
+  listId: state.list.listId,
+  listName: state.list.listName,
 });
 
 export default connect(mapState)(pure(CSSModules(ListHeader, styles)));

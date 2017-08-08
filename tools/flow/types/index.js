@@ -43,9 +43,9 @@ declare type Item = {|
 
 declare type ListState = {
   +isLoading: boolean,
-  +id: string,
-  +name: string,
-  +items: Array<Item>
+  +listId: string,
+  +listName: string,
+  +listItems: Array<Item>
 }
 
 declare type RootState = {

@@ -12,7 +12,7 @@ describe('List actions', () => {
     const expected = {
       type: List.CREATE_LIST,
       payload: {
-        name: 'list name',
+        listName: 'list name',
       },
     };
 
@@ -23,14 +23,14 @@ describe('List actions', () => {
     const expected = {
       type: List.CREATE_LIST_SUCCESS,
       payload: {
-        id: '-foobar',
-        name: 'list name',
+        listId: '-foobar',
+        listName: 'list name',
       },
     };
 
     expect(List.createListSuccess({
-      id: '-foobar',
-      name: 'list name',
+      listId: '-foobar',
+      listName: 'list name',
     })).toEqual(expected);
   });
 
@@ -47,7 +47,7 @@ describe('List actions', () => {
     const expected = {
       type: List.READ_LIST,
       payload: {
-        id: 'foo-123',
+        listId: 'foo-123',
       },
     };
 
@@ -58,14 +58,14 @@ describe('List actions', () => {
     const expected = {
       type: List.READ_LIST_SUCCESS,
       payload: {
-        id: 'foo-123',
-        name: 'list name',
+        listId: 'foo-123',
+        listName: 'list name',
       },
     };
 
     expect(List.readListSuccess({
-      id: 'foo-123',
-      name: 'list name',
+      listId: 'foo-123',
+      listName: 'list name',
     })).toEqual(expected);
   });
 
@@ -79,7 +79,7 @@ describe('List actions', () => {
   });
 
   it('should create action to read list items successfully', () => {
-    const items = [
+    const listItems = [
       {
         name: 'foo',
         index: 0,
@@ -95,18 +95,18 @@ describe('List actions', () => {
     const expected = {
       type: List.READ_LIST_ITEMS_SUCCESS,
       payload: {
-        items,
+        listItems,
       },
     };
 
-    expect(List.readListItemsSuccess(items)).toEqual(expected);
+    expect(List.readListItemsSuccess(listItems)).toEqual(expected);
   });
 
   it('should create action to delete list', () => {
     const expected = {
       type: List.DELETE_LIST,
       payload: {
-        id: 'foo-123',
+        listId: 'foo-123',
       },
     };
 
@@ -162,8 +162,39 @@ describe('List actions', () => {
     expect(List.addItemFailure()).toEqual(expected);
   });
 
+  it('should create an action for editing item', () => {
+    const expected = {
+      type: List.EDIT_ITEM,
+      payload: {
+        name: 'foo',
+        itemId: 'foo123',
+        listId: 'abc123',
+      },
+    };
+
+    expect(List.editItem({ name: 'foo', itemId: 'foo123', listId: 'abc123' })).toEqual(expected);
+  });
+
+  it('should create an action for editing item successfully', () => {
+    const expected = {
+      type: List.EDIT_ITEM_SUCCESS,
+      payload: {},
+    };
+
+    expect(List.editItemSuccess()).toEqual(expected);
+  });
+
+  it('should create an action for not editing item successfully', () => {
+    const expected = {
+      type: List.EDIT_ITEM_FAILURE,
+      payload: {},
+    };
+
+    expect(List.editItemFailure()).toEqual(expected);
+  });
+
   it('should create an action for sorting items', () => {
-    const items = [
+    const listItems = [
       {
         id: 'foo1',
         name: 'first',
@@ -178,12 +209,12 @@ describe('List actions', () => {
     const expected = {
       type: List.SORT_ITEMS,
       payload: {
-        items,
+        listItems,
         listId: 'foo123',
       },
     };
 
-    expect(List.sortItems({ items, listId: 'foo123' })).toEqual(expected);
+    expect(List.sortItems({ listItems, listId: 'foo123' })).toEqual(expected);
   });
 
   it('should create an action for successfully sorted items', () => {
@@ -226,7 +257,7 @@ describe('List reducer', () => {
     const action = {
       type: List.CREATE_LIST,
       payload: {
-        name: 'list name',
+        listName: 'list name',
       },
     };
 
@@ -244,15 +275,15 @@ describe('List reducer', () => {
     const action = {
       type: List.CREATE_LIST_SUCCESS,
       payload: {
-        id: '-foobar',
-        name: 'list name',
+        listId: '-foobar',
+        listName: 'list name',
       },
     };
 
     const expected = {
       ...List.initialState,
-      id: '-foobar',
-      name: 'list name',
+      listId: '-foobar',
+      listName: 'list name',
     };
 
     expect(
@@ -275,7 +306,7 @@ describe('List reducer', () => {
     const action = {
       type: List.READ_LIST,
       payload: {
-        id: 'foo-123',
+        listId: 'foo-123',
       },
     };
 
@@ -298,15 +329,15 @@ describe('List reducer', () => {
     const action = {
       type: List.READ_LIST_SUCCESS,
       payload: {
-        id: 'foo-123',
-        name: 'list name',
+        listId: 'foo-123',
+        listName: 'list name',
       },
     };
 
     const expected = {
       ...List.initialState,
-      id: 'foo-123',
-      name: 'list name',
+      listId: 'foo-123',
+      listName: 'list name',
     };
 
     expect(
@@ -333,11 +364,11 @@ describe('List reducer', () => {
   it('should handle READ_LIST_ITEMS_SUCCESS', () => {
     const initialState = {
       ...List.initialState,
-      id: 'foo123',
-      name: 'foolist',
+      listId: 'foo123',
+      listName: 'foolist',
     };
 
-    const items = [
+    const listItems = [
       {
         name: 'foo',
         index: 0,
@@ -353,13 +384,13 @@ describe('List reducer', () => {
     const action = {
       type: List.READ_LIST_ITEMS_SUCCESS,
       payload: {
-        items,
+        listItems,
       },
     };
 
     const expected = {
       ...initialState,
-      items,
+      listItems,
     };
 
     expect(
@@ -370,13 +401,13 @@ describe('List reducer', () => {
   it('should handle DELETE_LIST', () => {
     const initialState = {
       ...List.initialState,
-      id: 'foo-123',
+      listId: 'foo-123',
     };
 
     const action = {
       type: List.DELETE_LIST,
       payload: {
-        id: 'foo-123',
+        listId: 'foo-123',
       },
     };
 
@@ -394,7 +425,7 @@ describe('List reducer', () => {
     const initialState = {
       ...List.initialState,
       isLoading: true,
-      id: 'foo-123',
+      listId: 'foo-123',
     };
 
     const action = {
@@ -411,7 +442,7 @@ describe('List reducer', () => {
     const initialState = {
       ...List.initialState,
       isLoading: true,
-      id: 'foo-123',
+      listId: 'foo-123',
     };
 
     const action = {
@@ -432,14 +463,14 @@ describe('List reducer', () => {
   it('should handle ADD_ITEM', () => {
     const initialState = {
       ...List.initialState,
-      id: 'foo123',
-      name: 'foolist',
+      listId: 'foo123',
+      listName: 'foolist',
     };
 
     const action = {
       type: List.ADD_ITEM,
       payload: {
-        name: 'foo item',
+        listName: 'foo item',
         listId: 'foo123',
       },
     };
@@ -457,8 +488,8 @@ describe('List reducer', () => {
   it('should handle ADD_ITEM_SUCCESS', () => {
     const initialState = {
       ...List.initialState,
-      id: 'foo123',
-      name: 'foolist',
+      listId: 'foo123',
+      listName: 'foolist',
     };
 
     const action = {
@@ -474,8 +505,8 @@ describe('List reducer', () => {
   it('should handle ADD_ITEM_FAILURE', () => {
     const initialState = {
       ...List.initialState,
-      id: 'foo123',
-      name: 'foolist',
+      listId: 'foo123',
+      listName: 'foolist',
     };
 
     const action = {
@@ -488,8 +519,80 @@ describe('List reducer', () => {
     ).toEqual(initialState);
   });
 
+  it('should handle EDIT_ITEM', () => {
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist',
+    };
+
+    const action = {
+      type: List.EDIT_ITEM,
+      payload: {
+        name: 'foo',
+        itemId: 'abc123',
+        listId: 'foo123',
+      },
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: true,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle EDIT_ITEM_SUCCESS', () => {
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist',
+      isLoading: true,
+    };
+
+    const action = {
+      type: List.EDIT_ITEM_SUCCESS,
+      payload: {},
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: false,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle EDIT_ITEM_FAILURE', () => {
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist',
+      isLoading: true,
+    };
+
+    const action = {
+      type: List.EDIT_ITEM_FAILURE,
+      payload: {},
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: false,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
   it('should handle SORT_ITEMS', () => {
-    const items = [
+    const listItems = [
       {
         id: 'foo1',
         name: 'first',
@@ -504,15 +607,15 @@ describe('List reducer', () => {
 
     const initialState = {
       ...List.initialState,
-      id: 'foo123',
-      name: 'foolist',
-      items,
+      listId: 'foo123',
+      listName: 'foolist',
+      listItems,
     };
 
     const action = {
       type: List.SORT_ITEMS,
       payload: {
-        items,
+        listItems,
         listId: 'foo123',
       },
     };
@@ -530,8 +633,8 @@ describe('List reducer', () => {
   it('should handle SORT_ITEMS_SUCCES', () => {
     const initialState = {
       ...List.initialState,
-      id: 'foo123',
-      name: 'foolist',
+      listId: 'foo123',
+      listName: 'foolist',
       isLoading: true,
     };
 
@@ -553,8 +656,8 @@ describe('List reducer', () => {
   it('should handle SORT_ITEMS_FAILURE', () => {
     const initialState = {
       ...List.initialState,
-      id: 'foo123',
-      name: 'foolist',
+      listId: 'foo123',
+      listName: 'foolist',
       isLoading: true,
     };
 
