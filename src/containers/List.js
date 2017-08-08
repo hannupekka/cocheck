@@ -101,16 +101,40 @@ export class List extends Component {
     );
   };
 
-  renderInput = (): React$Element<any> =>
-    <div styleName="input__wrapper">
-      <input
-        ref={this.bindItemInput}
-        styleName="input"
-        type="text"
-        placeholder="New list item"
-        onKeyDown={this.onKeyDown}
-      />
-    </div>;
+  maybeRenderInput = (): ?React$Element<any> => {
+    const { listId, isLoading } = this.props;
+
+    if (isLoading && listId === '') {
+      return null;
+    }
+
+    return (
+      <div styleName="input__wrapper">
+        <input
+          ref={this.bindItemInput}
+          styleName="input"
+          type="text"
+          placeholder="New item"
+          onKeyDown={this.onKeyDown}
+        />
+      </div>
+    );
+  };
+
+  maybeRenderHelp = (): ?React$Element<any> => {
+    const { listId, isLoading } = this.props;
+
+    if (isLoading && listId === '') {
+      return null;
+    }
+
+    return (
+      <div styleName="help">
+        Share this list to others by giving them URL of this page. <br />
+        Double-click an item to edit it.
+      </div>
+    );
+  };
 
   maybeRenderItems = (): ?React$Element<any> => {
     const { listItems, listId, isLoading } = this.props;
@@ -135,8 +159,9 @@ export class List extends Component {
     return (
       <StickyContainer>
         {this.maybeRenderHeader()}
-        {this.renderInput()}
+        {this.maybeRenderInput()}
         {this.maybeRenderItems()}
+        {this.maybeRenderHelp()}
       </StickyContainer>
     );
   }

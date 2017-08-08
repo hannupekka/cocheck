@@ -69,7 +69,6 @@ export class ListItems extends Component {
     return (
       <div styleName="wrapper">
         {this.renderItemList()}
-        <div styleName="help">Double-click an item to edit it</div>
       </div>
     );
   }

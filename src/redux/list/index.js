@@ -1,6 +1,6 @@
 // @flow
 import { Observable, Action } from 'rxjs';
-import { push } from 'react-router-redux'
+import { push, LOCATION_CHANGE } from 'react-router-redux'
 import database from 'utils/database';
 import { hideConfirmation } from 'redux/confirm';
 import { showNotification } from 'redux/notification';
@@ -205,22 +205,34 @@ export const createListEpic =
     action$.ofType(CREATE_LIST)
       .flatMap(action => {
         const listsRef = database.ref('/lists');
-        const list = listsRef.push({
-          name: action.payload.name,
-          created: new Date().toISOString(),
-        });
-        const listId = list.ref.key;
-        const listName = action.payload.name;
 
-        return Observable.concat(
-          Observable.of(createListSuccess({
-            listId,
-            listName,
-          })),
-          Observable.of(push(`/list/${listId}`))
-        );
-      })
-      .catch(error => Observable.of(handleError(error)));
+        try {
+          const list = listsRef.push({
+            name: action.payload.listName,
+            created: new Date().toISOString(),
+          });
+          const listId = list.ref.key;
+          const listName = action.payload.name;
+
+          return Observable.concat(
+            Observable.of(createListSuccess({
+              listId,
+              listName,
+            })),
+            Observable.of(push(`/list/${listId}`))
+          );
+        } catch (e) {
+          return Observable.concat(
+            Observable.of(createListFailure()),
+            Observable.of(showNotification({
+              title: 'Error',
+              body: 'Could not create list',
+              icon: 'exclamation',
+              type: 'error',
+            }))
+          );
+        }
+      });
 
 export const readListEpic =
   (action$: Observable<Action>): Observable<Action> =>
@@ -250,18 +262,32 @@ export const readListEpic =
                 type: 'error',
               }))
           );
-      })
-      .catch(error => Observable.of(handleError(error)));
+      });
 
 export const deleteListEpic =
   (action$: Observable<Action>): Observable<Action> =>
     action$.ofType(DELETE_LIST)
       .flatMap(action => {
-        database.ref('/lists').child(action.payload.listId).remove();
+        const listRef = database.ref('/lists').child(action.payload.listId);
+        listRef.remove();
 
-        return Observable.of(hideConfirmation());
+        return Observable.fromPromise(
+          listRef.once('value')
+        );
       })
-      .catch(error => Observable.of(handleError(error)));
+      .flatMap(listRef => listRef.val() === null
+        ? Observable.of(hideConfirmation())
+        : Observable.concat(
+            Observable.of(hideConfirmation()),
+            Observable.of(deleteListFailure()),
+            Observable.of(showNotification({
+              title: 'Error',
+              body: 'Could not delete list',
+              icon: 'exclamation',
+              type: 'error',
+            }))
+          )
+      );
 
 export const deleteListSuccessEpic =
   (action$: Observable<Action>): Observable<Action> =>
@@ -270,39 +296,60 @@ export const deleteListSuccessEpic =
         Observable.of(showNotification({
           title: 'OK',
           body: 'List deleted',
-          icon: 'trash',
+          icon: 'trash-o',
           type: 'success',
         })),
         Observable.of(push('/'))
-      ))
-      .catch(error => Observable.of(handleError(error)));
+      ));
 
 export const addItemEpic = (action$: Observable<Action>): Observable<Action> =>
   action$.ofType(ADD_ITEM)
     .flatMap(action => {
       const { name, index, listId } = action.payload;
-
       const itemsRef = database.ref(`/items/${listId}`);
-      itemsRef.push({
-        name,
-        index,
-      });
 
-      return Observable.of(addItemSuccess());
-    })
-    .catch(error => Observable.of(handleError(error)));
+      try {
+        itemsRef.push({
+          name,
+          index,
+        });
+
+        return Observable.of(addItemSuccess());
+      } catch (e) {
+        return Observable.concat(
+          Observable.of(addItemFailure()),
+          Observable.of(showNotification({
+            title: 'Error',
+            body: 'Could not add item',
+            icon: 'exclamation',
+            type: 'error',
+          }))
+        );
+      }
+    });
 
 export const editItemEpic = (action$: Observable<Action>): Observable<Action> =>
   action$.ofType(EDIT_ITEM)
     .flatMap(action => {
       const { name, itemId, listId} = action.payload;
-
       const itemsRef = database.ref(`/items/${listId}/${itemId}`);
-      itemsRef.update({ name });
 
-      return Observable.of(editItemSuccess());
-    })
-    .catch(error => Observable.of(handleError(error)));
+      try {
+        itemsRef.update({ name });
+
+        return Observable.of(editItemSuccess());
+      } catch (e) {
+        return Observable.concat(
+          Observable.of(editItemFailure()),
+          Observable.of(showNotification({
+            title: 'Error',
+            body: 'Could not edit item',
+            icon: 'exclamation',
+            type: 'error',
+          }))
+        );
+      }
+    });
 
 export const sortItemsEpic = (action$: Observable<Action>): Observable<Action> =>
   action$.ofType(SORT_ITEMS)
@@ -318,10 +365,21 @@ export const sortItemsEpic = (action$: Observable<Action>): Observable<Action> =
         };
       });
 
-      database.ref(`/items/${listId}`).update(updates);
-      return Observable.of(sortItemsSuccess());
-    })
-    .catch(error => Observable.of(handleError(error)));
+      try {
+        database.ref(`/items/${listId}`).update(updates);
+        return Observable.of(sortItemsSuccess());
+      } catch (e) {
+        return Observable.concat(
+          Observable.of(sortItemsFailure()),
+          Observable.of(showNotification({
+            title: 'Error',
+            body: 'Could not sort items',
+            icon: 'exclamation',
+            type: 'error',
+          })),
+        );
+      }
+    });
 
 export const handleErrorEpic =
   (action$: Observable<Action>): Observable<Action> =>
@@ -356,11 +414,17 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
         isLoading: true,
       };
     case CREATE_LIST_SUCCESS:
-    case READ_LIST_SUCCESS:
       return {
         ...initialState,
         listId: action.payload.listId,
         listName: action.payload.listName,
+      };
+    case READ_LIST_SUCCESS:
+      return {
+        ...state,
+        listId: action.payload.listId,
+        listName: action.payload.listName,
+        isLoading: false,
       };
     case READ_LIST_ITEMS_SUCCESS:
       return {
@@ -370,6 +434,7 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
     case DELETE_LIST_SUCCESS:
     case CREATE_LIST_FAILURE:
     case READ_LIST_FAILURE:
+    case LOCATION_CHANGE:
     case HANDLE_ERROR:
       return initialState;
     case ADD_ITEM_SUCCESS:

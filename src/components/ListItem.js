@@ -108,7 +108,7 @@ export class ListItem extends Component {
             : this.renderName()}
         </div>
         <div styleName="delete">
-          <i className="fa fa-trash" aria-hidden onClick={this.onDelete} />
+          <i className="fa fa-trash-o" aria-hidden onClick={this.onDelete} />
         </div>
       </div>
     );

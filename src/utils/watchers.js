@@ -6,14 +6,17 @@ export const bindWatchers = (listId: string, dispatch: Function): void => {
   database.ref('/lists').orderByKey().equalTo(listId).on('child_removed', () => {
     dispatch(deleteListSuccess());
 
-    const itemsRef = database.ref('/items');
-    itemsRef.orderByChild('listId').equalTo(listId).once('value', items => {
-      const updates = {};
-      Object.keys(items.val()).forEach(key => {
-        updates[key] = null;
-      });
+    database.ref('/items').orderByChild('listId').equalTo(listId).once('value', itemsRef => {
+      const items = itemsRef.val();
 
-      itemsRef.update(updates);
+      if (items !== null) {
+        const updates = {};
+        Object.keys(items.val()).forEach(key => {
+          updates[key] = null;
+        });
+
+        itemsRef.update(updates);
+      }
     });
   });
 

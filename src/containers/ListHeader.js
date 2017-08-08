@@ -66,9 +66,11 @@ export class ListHeader extends Component {
       <div style={style} styleName={isSticky ? 'sticky' : 'static'}>
         {this.maybeRenderListName()}
         <button styleName="button" onClick={this.onCheckAllClick}>
+          <i className="fa fa-check-square-o" aria-hidden />
           Check all
         </button>
         <button styleName="button" onClick={this.onDeleteListClick}>
+          <i className="fa fa-trash-o" aria-hidden />
           Delete list
         </button>
       </div>

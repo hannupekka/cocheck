@@ -27,16 +27,25 @@ export class Index extends Component {
     dispatch(ListActions.createList(name));
   };
 
+  onKeyDown = (e: KeyboardEvent): void => {
+    if (e.key === 'Enter') {
+      this.onCreateList();
+    }
+  };
+
   render() {
     return (
-      <div>
+      <div styleName="wrapper">
+        <div styleName="header">Start by creating new list</div>
         <input
           type="text"
           styleName="input"
           placeholder="List name (optional)"
           ref={this.bindNameField}
+          onKeyDown={this.onKeyDown}
         />
         <button styleName="button" onClick={this.onCreateList}>
+          <i className="fa fa-plus" aria-hidden />
           Create new list
         </button>
       </div>
