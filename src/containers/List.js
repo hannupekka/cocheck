@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { StickyContainer, Sticky } from 'react-sticky';
 import { arrayMove } from 'react-sortable-hoc';
+import { Helmet } from 'react-helmet';
 import CSSModules from 'react-css-modules';
 import ListHeader from 'containers/ListHeader';
 import ListItems from 'containers/ListItems';
@@ -15,6 +16,7 @@ type Props = {
   dispatch: Function,
   match: Object,
   listId: string,
+  listName: string,
   listItems: Array<Item>,
   isLoading: boolean,
 };
@@ -156,8 +158,15 @@ export class List extends Component {
   };
 
   render() {
+    const { listName } = this.props;
+
     return (
       <StickyContainer>
+        <Helmet>
+          <title>
+            {listName === '' ? 'Cocheck' : `Cocheck - ${listName}`}
+          </title>
+        </Helmet>
         {this.maybeRenderHeader()}
         {this.maybeRenderInput()}
         {this.maybeRenderItems()}
@@ -169,6 +178,7 @@ export class List extends Component {
 
 type MappedState = {
   listId: string,
+  listName: string,
   listItems: Array<Item>,
   isLoading: boolean,
 };
@@ -176,6 +186,7 @@ type MappedState = {
 // eslint-disable-next-line
 const mapState: Function = (state: RootState): MappedState => ({
   listId: state.list.listId,
+  listName: state.list.listName,
   listItems: getItems(state),
   isLoading: state.list.isLoading,
 });
