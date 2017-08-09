@@ -1,8 +1,12 @@
 // @flow
 import database from 'utils/database';
-import { deleteListSuccess, readListItemsSuccess } from 'redux/list';
+import { deleteListSuccess, readListItemsSuccess, renameListSuccess } from 'redux/list';
 
 export const bindWatchers = (listId: string, dispatch: Function): void => {
+  database.ref(`/lists/${listId}/name`).on('value', nameRef => {
+    dispatch(renameListSuccess(nameRef.val()));
+  });
+
   database.ref('/lists').orderByKey().equalTo(listId).on('child_removed', () => {
     dispatch(deleteListSuccess());
 

@@ -131,6 +131,39 @@ describe('List actions', () => {
     expect(List.deleteListFailure()).toEqual(expected);
   });
 
+  it('should create action to rename list', () => {
+    const expected = {
+      type: List.RENAME_LIST,
+      payload: {
+        listName: 'foo',
+        listId: 'foo123',
+      },
+    };
+
+
+    expect(List.renameList({ listName: 'foo', listId: 'foo123'})).toEqual(expected);
+  });
+
+  it('should create action to rename list successfully', () => {
+    const expected = {
+      type: List.RENAME_LIST_SUCCESS,
+      payload: {
+        listName: 'foolist',
+      },
+    };
+
+    expect(List.renameListSuccess('foolist')).toEqual(expected);
+  });
+
+  it('should create action to not rename list successfully', () => {
+    const expected = {
+      type: List.RENAME_LIST_FAILURE,
+      payload: {},
+    };
+
+    expect(List.renameListFailure()).toEqual(expected);
+  });
+
   it('should create an action to add item', () => {
     const expected = {
       type: List.ADD_ITEM,
@@ -447,6 +480,80 @@ describe('List reducer', () => {
 
     const action = {
       type: List.DELETE_LIST_FAILURE,
+      payload: {},
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: false,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle RENAME_LIST', () => {
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist'
+    };
+
+    const action = {
+      type: List.RENAME_LIST,
+      payload: {
+        listId: 'foo123',
+        listName: 'new name',
+      },
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: true,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle RENAME_LIST_SUCCESS', () => {
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist',
+      isLoading: true,
+    };
+
+    const action = {
+      type: List.RENAME_LIST_SUCCESS,
+      payload: {
+        listName: 'new name',
+      },
+    };
+
+    const expected = {
+      ...initialState,
+      listName: 'new name',
+      isLoading: false,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle RENAME_LIST_FAILURE', () => {
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist',
+      isLoading: true,
+    };
+
+    const action = {
+      type: List.RENAME_LIST_FAILURE,
       payload: {},
     };
 

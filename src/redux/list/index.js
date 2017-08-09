@@ -18,6 +18,10 @@ export const DELETE_LIST = 'cocheck/list/DELETE_LIST';
 export const DELETE_LIST_SUCCESS = 'cocheck/list/DELETE_LIST_SUCCESS';
 export const DELETE_LIST_FAILURE = 'cocheck/list/DELETE_LIST_FAILURE';
 
+export const RENAME_LIST = 'cocheck/list/RENAME_LIST';
+export const RENAME_LIST_SUCCESS = 'cocheck/list/RENAME_LIST_SUCCESS';
+export const RENAME_LIST_FAILURE = 'cocheck/list/RENAME_LIST_FAILURE';
+
 export const HANDLE_ERROR = 'cocheck/list/HANDLE_ERROR';
 
 export const ADD_ITEM = 'cocheck/list/ADD_ITEM';
@@ -102,6 +106,27 @@ export const deleteListSuccess = (): ThunkAction => ({
 
 export const deleteListFailure = (): ThunkAction => ({
   type: DELETE_LIST_FAILURE,
+  payload: {},
+});
+
+export const renameList =
+  ({ listName, listId }: { listName: ?string, listId: string }): ThunkAction => ({
+    type: RENAME_LIST,
+    payload: {
+      listName,
+      listId,
+    },
+  });
+
+export const renameListSuccess = (listName: ?string): ThunkAction => ({
+  type: RENAME_LIST_SUCCESS,
+  payload: {
+    listName,
+  },
+});
+
+export const renameListFailure = (): ThunkAction => ({
+  type: RENAME_LIST_FAILURE,
   payload: {},
 });
 
@@ -302,6 +327,28 @@ export const deleteListSuccessEpic =
         Observable.of(push('/'))
       ));
 
+export const renameListEpic = (action$: Observable<Action>): Observable<Action> =>
+  action$.ofType(RENAME_LIST)
+    .flatMap(action => {
+      const { listName, listId } = action.payload;
+
+      try {
+        database.ref(`/lists/${listId}`).set({ name: listName });
+
+        return Observable.of();
+      } catch (e) {
+        return Observable.concat(
+          Observable.of(renameListFailure()),
+          Observable.of(showNotification({
+            title: 'Error',
+            body: 'Could not rename list',
+            icon: 'exclamation',
+            type: 'error',
+          }))
+        );
+      }
+    });
+
 export const addItemEpic = (action$: Observable<Action>): Observable<Action> =>
   action$.ofType(ADD_ITEM)
     .flatMap(action => {
@@ -409,6 +456,7 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
     case EDIT_ITEM:
     case SORT_ITEMS:
     case DELETE_LIST:
+    case RENAME_LIST:
       return {
         ...state,
         isLoading: true,
@@ -444,8 +492,15 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
     case SORT_ITEMS_SUCCESS:
     case SORT_ITEMS_FAILURE:
     case DELETE_LIST_FAILURE:
+    case RENAME_LIST_FAILURE:
       return {
         ...state,
+        isLoading: false,
+      };
+    case RENAME_LIST_SUCCESS:
+      return {
+        ...state,
+        listName: action.payload.listName,
         isLoading: false,
       };
     default:
