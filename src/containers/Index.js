@@ -49,7 +49,7 @@ export class Index extends Component {
           Create new list
         </button>
         <div styleName="footer">
-          <a href="https://github.com/hannupekka/yabsa" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/hannupekka/cocheck" target="_blank" rel="noopener noreferrer">
             Check out this project in GitHub
             <i className="fa fa-github" aria-hidden="true" />
           </a>
