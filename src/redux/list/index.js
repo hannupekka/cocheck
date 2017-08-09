@@ -38,7 +38,10 @@ export const EDIT_ITEM_FAILURE = 'cocheck/list/EDIT_ITEM_FAILURE';
 
 // export const CHECK_ITEM = 'cocheck/list/CHECK_ITEM';
 // export const UNCHECK_ITEM = 'cocheck/list/UNCHECK_ITEM';
-// export const REMOVE_ITEM = 'cocheck/list/REMOVE_ITEM';
+
+export const REMOVE_ITEM = 'cocheck/list/REMOVE_ITEM';
+export const REMOVE_ITEM_SUCCESS = 'cocheck/list/REMOVE_ITEM_SUCCESS';
+export const REMOVE_ITEM_FAILURE = 'cocheck/list/REMOVE_ITEM_FAILURE';
 
 // export const CHECK_ALL = 'cocheck/list/CHECK_ALL';
 // export const UNCHECK_ALL = 'cocheck/list/UNCHECK_ALL';
@@ -203,12 +206,23 @@ export const editItemFailure = (): ThunkAction => ({
 //   },
 // });
 
-// export const removeItem = (id: string): ThunkAction => ({
-//   type: REMOVE_ITEM,
-//   payload: {
-//     id,
-//   },
-// });
+export const removeItem = ({ itemId, listId}: { itemId: string, listId: string}): ThunkAction => ({
+  type: REMOVE_ITEM,
+  payload: {
+    itemId,
+    listId,
+  },
+});
+
+export const removeItemSuccess = (): ThunkAction => ({
+  type: REMOVE_ITEM_SUCCESS,
+  payload: {},
+});
+
+export const removeItemFailure = (): ThunkAction => ({
+  type: REMOVE_ITEM_FAILURE,
+  payload: {},
+});
 
 // export const checkAll = (): ThunkAction => ({
 //   type: CHECK_ALL,
@@ -398,6 +412,29 @@ export const editItemEpic = (action$: Observable<Action>): Observable<Action> =>
       }
     });
 
+export const removeItemEpic = (action$: Observable<Action>): Observable<Action> =>
+  action$.ofType(REMOVE_ITEM)
+    .flatMap(action => {
+      const { itemId, listId} = action.payload;
+      const itemRef = database.ref(`/items/${listId}/${itemId}`);
+
+      try {
+        itemRef.remove();
+
+        return Observable.of(removeItemSuccess());
+      } catch (e) {
+        return Observable.concat(
+          Observable.of(removeItemFailure()),
+          Observable.of(showNotification({
+            title: 'Error',
+            body: 'Could not remove item',
+            icon: 'exclamation',
+            type: 'error',
+          }))
+        );
+      }
+    });
+
 export const sortItemsEpic = (action$: Observable<Action>): Observable<Action> =>
   action$.ofType(SORT_ITEMS)
     .flatMap(action => {
@@ -454,6 +491,7 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
       };
     case ADD_ITEM:
     case EDIT_ITEM:
+    case REMOVE_ITEM:
     case SORT_ITEMS:
     case DELETE_LIST:
     case RENAME_LIST:
@@ -489,6 +527,8 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
     case ADD_ITEM_FAILURE:
     case EDIT_ITEM_SUCCESS:
     case EDIT_ITEM_FAILURE:
+    case REMOVE_ITEM_SUCCESS:
+    case REMOVE_ITEM_FAILURE:
     case SORT_ITEMS_SUCCESS:
     case SORT_ITEMS_FAILURE:
     case DELETE_LIST_FAILURE:

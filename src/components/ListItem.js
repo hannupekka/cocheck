@@ -14,6 +14,7 @@ type Props = {
   onEditStart: Function,
   onEditEnd: Function,
   onEditCancel: Function,
+  onRemove: Function,
 };
 
 type State = {
@@ -76,7 +77,7 @@ export class ListItem extends Component {
   };
 
   onDelete = (): void => {
-    console.log('delete', this.props.id);
+    this.props.onRemove(this.props.id);
   };
 
   renderName = (): React$Element<any> =>

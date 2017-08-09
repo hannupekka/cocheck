@@ -6,7 +6,7 @@ import { pure } from 'recompose';
 import { SortableContainer } from 'react-sortable-hoc';
 import CSSModules from 'react-css-modules';
 import ListItem from 'components/ListItem';
-import { editItem } from 'redux/list';
+import { editItem, removeItem } from 'redux/list';
 
 type Props = {
   dispatch: Function,
@@ -51,6 +51,12 @@ export class ListItems extends Component {
     this.setState({ editItemId: null });
   };
 
+  onRemove = (itemId: string) => {
+    const { dispatch, listId } = this.props;
+
+    dispatch(removeItem({ itemId, listId }));
+  };
+
   renderItemList = (): Array<React$Element<any>> =>
     this.props.listItems.map((item, index) =>
       <ListItem
@@ -61,6 +67,7 @@ export class ListItems extends Component {
         onEditStart={this.onEditStart}
         onEditEnd={this.onEditEnd}
         onEditCancel={this.onEditCancel}
+        onRemove={this.onRemove}
         isEdited={this.state.editItemId === item.id}
       />
     );

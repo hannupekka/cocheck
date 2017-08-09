@@ -11,7 +11,7 @@
     "start": "node server/server.js",
     "flow": "flow check",
     "flow:trace": "flow check --traces 5",
-    "lint": "./tools/flow_annotation_check.sh && eslint src",
+    "lint": "./tools/flow_annotation_check.sh && eslint src __test__",
     "test": "TEST_RUNNER=true jest",
     "test:coverage": "TEST_RUNNER=true jest --coverage",
     "test:update": "TEST_RUNNER=true jest -u",

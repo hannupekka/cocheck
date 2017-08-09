@@ -226,6 +226,38 @@ describe('List actions', () => {
     expect(List.editItemFailure()).toEqual(expected);
   });
 
+  it('should create an action for removing item from list', () => {
+    const expected = {
+      type: List.REMOVE_ITEM,
+      payload: {
+        itemId: 'foo123',
+        listId: 'bar123',
+      },
+    };
+
+    expect(List.removeItem({ itemId: 'foo123', listId: 'bar123' })).toEqual(expected);
+  });
+
+  it('should create an action for successfully removing item from list', () => {
+    const expected = {
+      type: List.REMOVE_ITEM_SUCCESS,
+      payload: {},
+    };
+
+    expect(List.removeItemSuccess()).toEqual(expected);
+  });
+
+  it('should create an action for not removing item from list successfully', () => {
+    const expected = {
+      type: List.REMOVE_ITEM_FAILURE,
+      payload: {
+      },
+    };
+
+    expect(List.removeItemFailure()).toEqual(expected);
+  });
+
+
   it('should create an action for sorting items', () => {
     const listItems = [
       {
@@ -497,7 +529,7 @@ describe('List reducer', () => {
     const initialState = {
       ...List.initialState,
       listId: 'foo123',
-      listName: 'foolist'
+      listName: 'foolist',
     };
 
     const action = {
@@ -685,6 +717,77 @@ describe('List reducer', () => {
 
     const action = {
       type: List.EDIT_ITEM_FAILURE,
+      payload: {},
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: false,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle REMOVE_ITEM', () => {
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist',
+    };
+
+    const action = {
+      type: List.REMOVE_ITEM,
+      payload: {
+        itemId: 'foo123',
+        listId: 'bar123',
+      },
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: true,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle REMOVE_ITEM_SUCCESS', () => {
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist',
+      isLoading: true,
+    };
+
+    const action = {
+      type: List.REMOVE_ITEM_SUCCESS,
+      payload: {},
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: false,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle REMOVE_ITEM_FAILURE', () => {
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist',
+      isLoading: true,
+    };
+
+    const action = {
+      type: List.REMOVE_ITEM_FAILURE,
       payload: {},
     };
 
