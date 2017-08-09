@@ -38,7 +38,8 @@ declare type NotificationState = {
 declare type Item = {|
   id: string,
   index: number,
-  name: string
+  name: string,
+  checked: boolean,
 |}
 
 declare type ListState = {

@@ -257,6 +257,38 @@ describe('List actions', () => {
     expect(List.removeItemFailure()).toEqual(expected);
   });
 
+  it('should create an action for toggling item state', () => {
+    const expected = {
+      type: List.TOGGLE_ITEM,
+      payload: {
+        checked: true,
+        itemId: 'item123',
+        listId: 'list123',
+      },
+    };
+
+    expect(
+      List.toggleItem({ checked: true, itemId: 'item123', listId: 'list123'})
+    ).toEqual(expected);
+  });
+
+  it('should create an action for successfully toggling item state', () => {
+    const expected = {
+      type: List.TOGGLE_ITEM_SUCCESS,
+      payload: {},
+    };
+
+    expect(List.toggleItemSuccess()).toEqual(expected);
+  });
+
+  it('should create an action for not successfully toggling item state', () => {
+    const expected = {
+      type: List.TOGGLE_ITEM_FAILURE,
+      payload: {},
+    };
+
+    expect(List.toggleItemFailure()).toEqual(expected);
+  });
 
   it('should create an action for sorting items', () => {
     const listItems = [
@@ -717,6 +749,77 @@ describe('List reducer', () => {
 
     const action = {
       type: List.EDIT_ITEM_FAILURE,
+      payload: {},
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: false,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle TOGGLE_ITEM', () => {
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist',
+    };
+
+    const action = {
+      type: List.TOGGLE_ITEM,
+      payload: {
+        itemId: 'foo123',
+        listId: 'bar123',
+      },
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: true,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle TOGGLE_ITEM_SUCCESS', () => {
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist',
+      isLoading: true,
+    };
+
+    const action = {
+      type: List.TOGGLE_ITEM_SUCCESS,
+      payload: {},
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: false,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle TOGGLE_ITEM_FAILURE', () => {
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist',
+      isLoading: true,
+    };
+
+    const action = {
+      type: List.TOGGLE_ITEM_FAILURE,
       payload: {},
     };
 

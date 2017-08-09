@@ -12,6 +12,11 @@
   }
 }
 
+.item--checked {
+  composes: item;
+  opacity: 0.5;
+}
+
 .icon {
   padding: @padding--half;
   opacity: 0.5;
@@ -42,6 +47,11 @@
   composes: base__input;
   border: none;
   padding: 0;
+
+  .item--checked & {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
 }
 
 .edit {

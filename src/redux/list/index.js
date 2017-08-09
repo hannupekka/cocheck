@@ -36,8 +36,9 @@ export const EDIT_ITEM = 'cocheck/list/EDIT_ITEM';
 export const EDIT_ITEM_SUCCESS = 'cocheck/list/EDIT_ITEM_SUCCESS';
 export const EDIT_ITEM_FAILURE = 'cocheck/list/EDIT_ITEM_FAILURE';
 
-// export const CHECK_ITEM = 'cocheck/list/CHECK_ITEM';
-// export const UNCHECK_ITEM = 'cocheck/list/UNCHECK_ITEM';
+export const TOGGLE_ITEM = 'cocheck/list/TOGGLE_ITEM';
+export const TOGGLE_ITEM_SUCCESS = 'cocheck/list/TOGGLE_ITEM_SUCCESS';
+export const TOGGLE_ITEM_FAILURE = 'cocheck/list/TOGGLE_ITEM_FAILURE';
 
 export const REMOVE_ITEM = 'cocheck/list/REMOVE_ITEM';
 export const REMOVE_ITEM_SUCCESS = 'cocheck/list/REMOVE_ITEM_SUCCESS';
@@ -192,21 +193,28 @@ export const editItemFailure = (): ThunkAction => ({
   payload: {},
 });
 
-// export const checkItem = (id: string): ThunkAction => ({
-//   type: CHECK_ITEM,
-//   payload: {
-//     id,
-//   },
-// });
+export const toggleItem =
+  ({ checked, itemId, listId }: { checked: boolean, itemId: string, listId: string}): ThunkAction =>
+    ({
+      type: TOGGLE_ITEM,
+      payload: {
+        checked,
+        itemId,
+        listId,
+      },
+    });
 
-// export const uncheckItem = (id: string): ThunkAction => ({
-//   type: UNCHECK_ITEM,
-//   payload: {
-//     id,
-//   },
-// });
+export const toggleItemSuccess = (): ThunkAction => ({
+  type: TOGGLE_ITEM_SUCCESS,
+  payload: {},
+});
 
-export const removeItem = ({ itemId, listId}: { itemId: string, listId: string}): ThunkAction => ({
+export const toggleItemFailure = (): ThunkAction => ({
+  type: TOGGLE_ITEM_FAILURE,
+  payload: {},
+});
+
+export const removeItem = ({ itemId, listId }: { itemId: string, listId: string}): ThunkAction => ({
   type: REMOVE_ITEM,
   payload: {
     itemId,
@@ -373,6 +381,7 @@ export const addItemEpic = (action$: Observable<Action>): Observable<Action> =>
         itemsRef.push({
           name,
           index,
+          checked: false,
         });
 
         return Observable.of(addItemSuccess());
@@ -393,10 +402,10 @@ export const editItemEpic = (action$: Observable<Action>): Observable<Action> =>
   action$.ofType(EDIT_ITEM)
     .flatMap(action => {
       const { name, itemId, listId} = action.payload;
-      const itemsRef = database.ref(`/items/${listId}/${itemId}`);
+      const itemRef = database.ref(`/items/${listId}/${itemId}`);
 
       try {
-        itemsRef.update({ name });
+        itemRef.update({ name });
 
         return Observable.of(editItemSuccess());
       } catch (e) {
@@ -415,7 +424,7 @@ export const editItemEpic = (action$: Observable<Action>): Observable<Action> =>
 export const removeItemEpic = (action$: Observable<Action>): Observable<Action> =>
   action$.ofType(REMOVE_ITEM)
     .flatMap(action => {
-      const { itemId, listId} = action.payload;
+      const { itemId, listId } = action.payload;
       const itemRef = database.ref(`/items/${listId}/${itemId}`);
 
       try {
@@ -435,6 +444,31 @@ export const removeItemEpic = (action$: Observable<Action>): Observable<Action> 
       }
     });
 
+export const toggleItemEpic = (action$: Observable<Action>): Observable<Action> =>
+  action$.ofType(TOGGLE_ITEM)
+    .flatMap(action => {
+      const { checked, itemId, listId } = action.payload;
+      const itemRef = database.ref(`/items/${listId}/${itemId}`);
+
+      const op = checked ? 'uncheck' : 'check';
+
+      try {
+        itemRef.update({ checked: !checked });
+
+        return Observable.of(toggleItemSuccess());
+      } catch (e) {
+        return Observable.concat(
+          Observable.of(toggleItemFailure()),
+          Observable.of(showNotification({
+            title: 'Error',
+            body: `Could not ${op} item`,
+            icon: 'exclamation',
+            type: 'error',
+          }))
+        );
+      }
+    });
+
 export const sortItemsEpic = (action$: Observable<Action>): Observable<Action> =>
   action$.ofType(SORT_ITEMS)
     .flatMap(action => {
@@ -446,6 +480,7 @@ export const sortItemsEpic = (action$: Observable<Action>): Observable<Action> =
         updates[item.id] = {
           index: item.index,
           name: item.name,
+          checked: item.checked,
         };
       });
 
@@ -491,6 +526,7 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
       };
     case ADD_ITEM:
     case EDIT_ITEM:
+    case TOGGLE_ITEM:
     case REMOVE_ITEM:
     case SORT_ITEMS:
     case DELETE_LIST:
@@ -527,6 +563,8 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
     case ADD_ITEM_FAILURE:
     case EDIT_ITEM_SUCCESS:
     case EDIT_ITEM_FAILURE:
+    case TOGGLE_ITEM_SUCCESS:
+    case TOGGLE_ITEM_FAILURE:
     case REMOVE_ITEM_SUCCESS:
     case REMOVE_ITEM_FAILURE:
     case SORT_ITEMS_SUCCESS:

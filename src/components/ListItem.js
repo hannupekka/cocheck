@@ -10,11 +10,13 @@ import CSSModules from 'react-css-modules';
 type Props = {
   id: string,
   name: string,
+  checked: boolean,
   isEdited: boolean,
   onEditStart: Function,
   onEditEnd: Function,
   onEditCancel: Function,
   onRemove: Function,
+  onToggle: Function,
 };
 
 type State = {
@@ -39,8 +41,11 @@ export class ListItem extends Component {
     this.setState({ name: nextProps.name });
   };
 
-  onCheck = (): void => {
-    console.log('check', this.props.id);
+  onToggle = (): void => {
+    const itemId = this.props.id;
+    const { checked } = this.props;
+
+    this.props.onToggle({ checked, itemId });
   };
 
   onDoubleClick = (): void => {
@@ -93,13 +98,16 @@ export class ListItem extends Component {
     />;
 
   render() {
+    const { checked } = this.props;
+    const icon = checked ? 'fa fa-check-square-o' : 'fa fa-square-o';
+
     return (
-      <div styleName="item">
+      <div styleName={checked ? 'item--checked' : 'item'}>
         <div styleName="handle">
           {<DragHandle />}
         </div>
         <div styleName="check">
-          <i className="fa fa-square-o" aria-hidden onClick={this.onCheck} />
+          <i className={icon} aria-hidden onClick={this.onToggle} />
         </div>
         <div styleName="name" onDoubleClick={this.onDoubleClick}>
           {this.props.isEdited

@@ -12,6 +12,7 @@ import list, {
   renameListEpic,
   addItemEpic,
   editItemEpic,
+  toggleItemEpic,
   removeItemEpic,
   sortItemsEpic,
   handleErrorEpic,
@@ -32,6 +33,7 @@ export const rootEpic = combineEpics(
   renameListEpic,
   addItemEpic,
   editItemEpic,
+  toggleItemEpic,
   removeItemEpic,
   sortItemsEpic,
   handleErrorEpic

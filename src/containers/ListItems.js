@@ -6,7 +6,7 @@ import { pure } from 'recompose';
 import { SortableContainer } from 'react-sortable-hoc';
 import CSSModules from 'react-css-modules';
 import ListItem from 'components/ListItem';
-import { editItem, removeItem } from 'redux/list';
+import { editItem, removeItem, toggleItem } from 'redux/list';
 
 type Props = {
   dispatch: Function,
@@ -57,6 +57,13 @@ export class ListItems extends Component {
     dispatch(removeItem({ itemId, listId }));
   };
 
+  // eslint-disable-next-line react/no-unused-prop-types
+  onToggle = ({ checked, itemId }: { checked: boolean, itemId: string }) => {
+    const { dispatch, listId } = this.props;
+
+    dispatch(toggleItem({ checked, itemId, listId }));
+  };
+
   renderItemList = (): Array<React$Element<any>> =>
     this.props.listItems.map((item, index) =>
       <ListItem
@@ -64,10 +71,12 @@ export class ListItems extends Component {
         index={index}
         id={item.id}
         name={item.name}
+        checked={item.checked}
         onEditStart={this.onEditStart}
         onEditEnd={this.onEditEnd}
         onEditCancel={this.onEditCancel}
         onRemove={this.onRemove}
+        onToggle={this.onToggle}
         isEdited={this.state.editItemId === item.id}
       />
     );
