@@ -146,6 +146,7 @@ export class ListHeader extends Component {
         readOnly={!this.state.edit}
         styleName={this.state.edit ? 'edit' : 'display'}
         type="text"
+        placeholder={this.state.listName === '' && !this.state.edit ? '(Unnamed list)' : ''}
         value={this.state.listName}
         onChange={this.onNameChange}
         onKeyDown={this.onKeyDown}
