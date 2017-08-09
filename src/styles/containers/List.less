@@ -1,17 +1,16 @@
 @import '~styles/main';
 
 .input__wrapper {
-  margin: @padding 0;
+  margin: (@padding * 2) 0;
   text-align: center;
 }
 
 .input {
   composes: base__input;
-  width: 50%;
+  width: 100%;
 }
 
 .empty {
-  width: 50%;
   margin: 0 auto;
   text-align: center;
 }
@@ -20,5 +19,12 @@
   font-size: 70%;
   color: darken(@color__light, 30%);
   text-align: center;
-  margin-top: @padding;
+  margin-top: @padding * 2;
+}
+
+@media @md {
+  .input,
+  .empty {
+    width: 50%;
+  }
 }

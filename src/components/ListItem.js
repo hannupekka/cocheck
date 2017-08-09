@@ -48,7 +48,7 @@ export class ListItem extends Component {
     this.props.onToggle({ checked, itemId });
   };
 
-  onDoubleClick = (): void => {
+  onEdit = (): void => {
     this.props.onEditStart(this.props.id);
     requestAnimationFrame(() => {
       const field = document.getElementById(`input-${this.props.id}`);
@@ -90,7 +90,7 @@ export class ListItem extends Component {
       id={`input-${this.props.id}`}
       debounceTimeout={50}
       readOnly={!this.props.isEdited}
-      styleName={this.props.isEdited ? 'edit' : 'display'}
+      styleName={this.props.isEdited ? 'name--edit' : 'name--display'}
       type="text"
       value={this.state.name}
       onKeyDown={this.onKeyDown}
@@ -109,12 +109,15 @@ export class ListItem extends Component {
         <div styleName="check">
           <i className={icon} aria-hidden onClick={this.onToggle} />
         </div>
-        <div styleName="name" onDoubleClick={this.onDoubleClick}>
+        <div styleName="name">
           {this.props.isEdited
             ? <ClickOutside onClickOutside={this.onClickOutside}>
                 {this.renderName()}
               </ClickOutside>
             : this.renderName()}
+        </div>
+        <div styleName="edit">
+          <i className="fa fa-pencil" aria-hidden onClick={this.onEdit} />
         </div>
         <div styleName="delete">
           <i className="fa fa-trash-o" aria-hidden onClick={this.onDelete} />

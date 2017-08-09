@@ -99,7 +99,7 @@ export class ListHeader extends Component {
     );
   };
 
-  onNameDoubleClick = (): void => {
+  onNameEdit = (): void => {
     this.setState({ edit: true });
 
     requestAnimationFrame(() => {
@@ -149,8 +149,8 @@ export class ListHeader extends Component {
         value={this.state.listName}
         onChange={this.onNameChange}
         onKeyDown={this.onKeyDown}
-        onDoubleClick={this.onNameDoubleClick}
       />
+      <i className="fa fa-pencil" styleName="button--edit" aria-hidden onClick={this.onNameEdit} />
     </div>;
 
   render() {
@@ -164,15 +164,15 @@ export class ListHeader extends Component {
           : this.renderListName()}
         <button styleName="button" onClick={this.onCheckAllClick}>
           <i className="fa fa-check-square-o" aria-hidden />
-          Check all
+          <span styleName="button__text">Check all</span>
         </button>
         <button styleName="button" onClick={this.onUncheckAllClick}>
           <i className="fa fa-square-o" aria-hidden />
-          Uncheck all
+          <span styleName="button__text">Uncheck all</span>
         </button>
         <button styleName="button" onClick={this.onDeleteListClick}>
           <i className="fa fa-trash-o" aria-hidden />
-          Delete list
+          <span styleName="button__text">Delete list</span>
         </button>
       </div>
     );

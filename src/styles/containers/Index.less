@@ -1,23 +1,47 @@
 @import '~styles/main';
 
 .wrapper {
-  width: 50%;
   margin: 0 auto;
   text-align: center;
 }
 
 .header {
   font-size: 120%;
-  margin: @padding 0;
+  margin: @padding 0 @padding * 2;
 }
 
 .input {
   composes: base__input;
   display: block;
-  margin-bottom: @padding;
+  margin-bottom: @padding * 2;
   width: 100%;
 }
 
 .button {
   composes: base__button;
+}
+
+.footer {
+  font-size: 90%;
+  margin-top: @padding * 2;
+
+  a {
+    color: darken(@color__light, 30%);
+    text-decoration: none;
+    transition: 0.1s color linear;
+
+    &:hover {
+    color: @color__dark;
+    }
+
+    i {
+      margin-left: @padding--half;
+    }
+  }
+}
+
+@media @md {
+  .wrapper {
+    width: 50%;
+  }
 }
