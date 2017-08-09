@@ -132,8 +132,7 @@ export class List extends Component {
 
     return (
       <div styleName="help">
-        Share this list to others by giving them URL of this page. <br />
-        Double-click an item to edit it.
+        Share this list to others by giving them URL of this page.
       </div>
     );
   };
