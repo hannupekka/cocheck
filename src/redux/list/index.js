@@ -44,8 +44,9 @@ export const REMOVE_ITEM = 'cocheck/list/REMOVE_ITEM';
 export const REMOVE_ITEM_SUCCESS = 'cocheck/list/REMOVE_ITEM_SUCCESS';
 export const REMOVE_ITEM_FAILURE = 'cocheck/list/REMOVE_ITEM_FAILURE';
 
-// export const CHECK_ALL = 'cocheck/list/CHECK_ALL';
-// export const UNCHECK_ALL = 'cocheck/list/UNCHECK_ALL';
+export const TOGGLE_ALL_ITEMS = 'cocheck/list/TOGGLE_ALL_ITEMS';
+export const TOGGLE_ALL_ITEMS_SUCCESS = 'cocheck/list/TOGGLE_ALL_ITEMS_SUCCESS';
+export const TOGGLE_ALL_ITEMS_FAILURE = 'cocheck/list/TOGGLE_ALL_ITEMS_FAILURE';
 
 export const createList = (listName: string): ThunkAction => ({
   type: CREATE_LIST,
@@ -232,15 +233,26 @@ export const removeItemFailure = (): ThunkAction => ({
   payload: {},
 });
 
-// export const checkAll = (): ThunkAction => ({
-//   type: CHECK_ALL,
-//   payload: {},
-// });
+export const toggleAllItems =
+  // eslint-disable-next-line max-len
+  ({ checked, listId, listItems }: { checked: boolean, listId: string, listItems: Array<Item> }): ThunkAction => ({
+    type: TOGGLE_ALL_ITEMS,
+    payload: {
+      checked,
+      listId,
+      listItems,
+    },
+  });
 
-// export const uncheckAll = (): ThunkAction => ({
-//   type: UNCHECK_ALL,
-//   payload: {},
-// });
+export const toggleAllItemsSuccess = (): ThunkAction => ({
+  type: TOGGLE_ALL_ITEMS_SUCCESS,
+  payload: {},
+});
+
+export const toggleAllItemsFailure = (): ThunkAction => ({
+  type: TOGGLE_ALL_ITEMS_FAILURE,
+  payload: {},
+});
 
 export const handleError = (error: Object): ThunkAction => ({
   type: HANDLE_ERROR,
@@ -500,6 +512,41 @@ export const sortItemsEpic = (action$: Observable<Action>): Observable<Action> =
       }
     });
 
+export const toggleAllItemsEpic = (action$: Observable<Action>): Observable<Action> =>
+  action$.ofType(TOGGLE_ALL_ITEMS)
+    .flatMap(action => {
+      const { checked, listId, listItems } = action.payload;
+      const op = checked ? 'check' : 'uncheck';
+
+      const updates = {};
+
+      listItems.forEach(item => {
+        updates[item.id] = {
+          index: item.index,
+          name: item.name,
+          checked,
+        };
+      });
+
+      try {
+        database.ref(`/items/${listId}`).update(updates);
+        return Observable.concat(
+          Observable.of(hideConfirmation()),
+          Observable.of(toggleAllItemsSuccess())
+        );
+      } catch (e) {
+        return Observable.concat(
+          Observable.of(toggleAllItemsFailure()),
+          Observable.of(showNotification({
+            title: 'Error',
+            body: `Could not ${op} items`,
+            icon: 'exclamation',
+            type: 'error',
+          })),
+        );
+      }
+    });
+
 export const handleErrorEpic =
   (action$: Observable<Action>): Observable<Action> =>
     action$.ofType(HANDLE_ERROR)
@@ -527,6 +574,7 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
     case ADD_ITEM:
     case EDIT_ITEM:
     case TOGGLE_ITEM:
+    case TOGGLE_ALL_ITEMS:
     case REMOVE_ITEM:
     case SORT_ITEMS:
     case DELETE_LIST:
@@ -565,6 +613,8 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
     case EDIT_ITEM_FAILURE:
     case TOGGLE_ITEM_SUCCESS:
     case TOGGLE_ITEM_FAILURE:
+    case TOGGLE_ALL_ITEMS_SUCCESS:
+    case TOGGLE_ALL_ITEMS_FAILURE:
     case REMOVE_ITEM_SUCCESS:
     case REMOVE_ITEM_FAILURE:
     case SORT_ITEMS_SUCCESS:

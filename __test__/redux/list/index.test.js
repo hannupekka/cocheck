@@ -332,6 +332,51 @@ describe('List actions', () => {
     expect(List.sortItemsFailure()).toEqual(expected);
   });
 
+  it('should create an action for toggling all items', () => {
+    const listItems = [
+      {
+        id: 'foo1',
+        name: 'first',
+        index: 0,
+      }, {
+        id: 'foo2',
+        name: 'second',
+        index: 1,
+      },
+    ];
+
+    const expected = {
+      type: List.TOGGLE_ALL_ITEMS,
+      payload: {
+        checked: true,
+        listId: 'list123',
+        listItems,
+      },
+    };
+
+    expect(
+      List.toggleAllItems({ checked: true, listId: 'list123', listItems })
+    ).toEqual(expected);
+  });
+
+  it('should create an action for successfully toggling all items', () => {
+    const expected = {
+      type: List.TOGGLE_ALL_ITEMS_SUCCESS,
+      payload: {},
+    };
+
+    expect(List.toggleAllItemsSuccess()).toEqual(expected);
+  });
+
+  it('should create an action for not successfully toggling all items', () => {
+    const expected = {
+      type: List.TOGGLE_ALL_ITEMS_FAILURE,
+      payload: {},
+    };
+
+    expect(List.toggleAllItemsFailure()).toEqual(expected);
+  });
+
   it('should create action to handle error', () => {
     const error = new Error('error');
     const expected = {
@@ -976,6 +1021,91 @@ describe('List reducer', () => {
 
     const action = {
       type: List.SORT_ITEMS_FAILURE,
+      payload: {},
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: false,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle TOGGLE_ALL_ITEMS', () => {
+    const listItems = [
+      {
+        id: 'foo1',
+        name: 'first',
+        index: 0,
+      },
+      {
+        id: 'foo2',
+        name: 'second',
+        index: 1,
+      },
+    ];
+
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist',
+    };
+
+    const action = {
+      type: List.TOGGLE_ALL_ITEMS,
+      payload: {
+        checked: true,
+        listId: 'bar123',
+        listItems,
+      },
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: true,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle TOGGLE_ALL_ITEMS_SUCCESS', () => {
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist',
+      isLoading: true,
+    };
+
+    const action = {
+      type: List.TOGGLE_ALL_ITEMS_SUCCESS,
+      payload: {},
+    };
+
+    const expected = {
+      ...initialState,
+      isLoading: false,
+    };
+
+    expect(
+      reducer(initialState, action)
+    ).toEqual(expected);
+  });
+
+  it('should handle TOGGLE_ALL_ITEMS_FAILURE', () => {
+    const initialState = {
+      ...List.initialState,
+      listId: 'foo123',
+      listName: 'foolist',
+      isLoading: true,
+    };
+
+    const action = {
+      type: List.TOGGLE_ALL_ITEMS_FAILURE,
       payload: {},
     };
 

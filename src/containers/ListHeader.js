@@ -8,11 +8,13 @@ import DebounceInput from 'react-debounce-input';
 import CSSModules from 'react-css-modules';
 import * as ConfirmActions from 'redux/confirm';
 import * as ListActions from 'redux/list';
+import getItems from 'redux/list/selectors';
 
 type Props = {
   dispatch: Function,
   listId: string,
   listName: string,
+  listItems: Array<Item>,
   isSticky: boolean,
   style: Object,
 };
@@ -40,7 +42,27 @@ export class ListHeader extends Component {
     this.setState({ listName: nextProps.listName });
   };
 
-  onCheckAllConfirm = (): void => {};
+  onCheckAllConfirm = (): void => {
+    const { dispatch, listId, listItems } = this.props;
+    dispatch(
+      ListActions.toggleAllItems({
+        checked: true,
+        listId,
+        listItems,
+      })
+    );
+  };
+
+  onUncheckAllConfirm = (): void => {
+    const { dispatch, listId, listItems } = this.props;
+    dispatch(
+      ListActions.toggleAllItems({
+        checked: false,
+        listId,
+        listItems,
+      })
+    );
+  };
 
   onCheckAllClick = (): void => {
     const { dispatch } = this.props;
@@ -48,6 +70,16 @@ export class ListHeader extends Component {
       ConfirmActions.showConfirmation({
         text: 'Check all?',
         onConfirm: this.onCheckAllConfirm,
+      })
+    );
+  };
+
+  onUncheckAllClick = (): void => {
+    const { dispatch } = this.props;
+    dispatch(
+      ConfirmActions.showConfirmation({
+        text: 'Uncheck all?',
+        onConfirm: this.onUncheckAllConfirm,
       })
     );
   };
@@ -134,6 +166,10 @@ export class ListHeader extends Component {
           <i className="fa fa-check-square-o" aria-hidden />
           Check all
         </button>
+        <button styleName="button" onClick={this.onUncheckAllClick}>
+          <i className="fa fa-square-o" aria-hidden />
+          Uncheck all
+        </button>
         <button styleName="button" onClick={this.onDeleteListClick}>
           <i className="fa fa-trash-o" aria-hidden />
           Delete list
@@ -146,12 +182,14 @@ export class ListHeader extends Component {
 type MappedState = {
   listId: string,
   listName: string,
+  listItems: Array<Item>,
 };
 
 // eslint-disable-next-line
 const mapState: Function = (state: RootState): MappedState => ({
   listId: state.list.listId,
   listName: state.list.listName,
+  listItems: getItems(state),
 });
 
 export default connect(mapState)(pure(CSSModules(ListHeader, styles)));
