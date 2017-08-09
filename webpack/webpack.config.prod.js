@@ -43,7 +43,9 @@ module.exports = {
     publicPath: '/',
   },
   plugins: [
-    new Dotenv(),
+    new Dotenv({
+      systemvars: true,
+    }),
     new ExtractTextPlugin({
       filename: 'styles.[hash].css',
       allChunks: true,

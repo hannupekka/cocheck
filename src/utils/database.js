@@ -8,7 +8,6 @@ const firebaseConfig = {
   apiKey: config.firebaseApiKey,
   authDomain: config.firebaseAuthDomain,
   databaseURL: config.firebaseDatabaseURL,
-  storageBucket: config.firebaseStorageBucket,
 };
 
 firebase.initializeApp(firebaseConfig);
