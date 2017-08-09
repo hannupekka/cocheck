@@ -36,7 +36,10 @@ export class Index extends Component {
   render() {
     return (
       <div styleName="wrapper">
-        <div styleName="header">Start by creating new list</div>
+        <div styleName="header">
+          Cocheck lets you create shareable, collaborative checklists.
+          <p>Start by creating new list.</p>
+        </div>
         <input
           type="text"
           styleName="input"
