@@ -2,7 +2,6 @@
 import styles from 'styles/containers/List.less';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { StickyContainer, Sticky } from 'react-sticky';
 import { arrayMove } from 'react-sortable-hoc';
 import { Helmet } from 'react-helmet';
 import CSSModules from 'react-css-modules';
@@ -44,8 +43,15 @@ export class List extends Component {
     bindWatchers(listId, dispatch);
   };
 
+  componentDidMount = (): void => {
+    if (this.itemInput) {
+      this.itemInput.focus();
+    }
+  };
+
   componentWillUnmount = (): void => {
-    removeWatchers();
+    const { listId } = this.props;
+    removeWatchers(listId);
   };
 
   onKeyDown = (e: KeyboardEvent): void => {
@@ -96,11 +102,7 @@ export class List extends Component {
       return null;
     }
 
-    return (
-      <Sticky topOffset={-16}>
-        {({ isSticky, style }) => <ListHeader isSticky={isSticky} style={style} />}
-      </Sticky>
-    );
+    return <ListHeader />;
   };
 
   maybeRenderInput = (): ?React$Element<any> => {
@@ -156,7 +158,7 @@ export class List extends Component {
     const { listName } = this.props;
 
     return (
-      <StickyContainer>
+      <div styleName="wrapper">
         <Helmet>
           <title>
             {listName === '' ? 'Cocheck' : `Cocheck - ${listName}`}
@@ -166,7 +168,7 @@ export class List extends Component {
         {this.maybeRenderInput()}
         {this.maybeRenderItems()}
         {this.maybeRenderHelp()}
-      </StickyContainer>
+      </div>
     );
   }
 }

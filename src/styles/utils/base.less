@@ -2,9 +2,13 @@
 
 // Base styles for reusable components like form elements.
 .base__input {
+  appearance: none;
   padding: @padding--half @padding;
   border: 1px solid @color__border;
+  border-radius: 0;
   font-family: 'Montserrat', sans-serif;
+  font-size: 80%;
+  width: 100%;
 }
 
 .base__button {
@@ -22,5 +26,11 @@
   &:hover {
     cursor: pointer;
     background-color: darken(@color__accent, 5%);
+  }
+}
+
+@media @sm {
+  .base__input {
+    font-size: 100%;
   }
 }

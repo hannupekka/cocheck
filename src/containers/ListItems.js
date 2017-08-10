@@ -38,6 +38,7 @@ export class ListItems extends Component {
     const { dispatch, listId } = this.props;
 
     this.setState({ editItemId: null });
+
     dispatch(
       editItem({
         name,

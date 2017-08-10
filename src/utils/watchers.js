@@ -3,16 +3,25 @@ import database from 'utils/database';
 import { deleteListSuccess, readListItemsSuccess, renameListSuccess } from 'redux/list';
 
 export const bindWatchers = (listId: string, dispatch: Function): void => {
+  let initialLoadDone = false;
+
+  // Initial load.
+  database.ref(`/lists/${listId}`).once('value', listRef => {
+    if (listRef.val() !== null) {
+      initialLoadDone = true;
+    }
+  });
+
   // List removed.
   database.ref(`/lists/${listId}`).on('value', listRef => {
-    if (listRef.val() === null) {
+    if (initialLoadDone && listRef.val() === null) {
       dispatch(deleteListSuccess());
     }
   });
 
   // List renamed.
   database.ref(`/lists/${listId}/name`).on('value', nameRef => {
-    if (nameRef.val() !== null) {
+    if (initialLoadDone && nameRef.val() !== null) {
       dispatch(renameListSuccess(nameRef.val()));
     }
   });
@@ -31,7 +40,8 @@ export const bindWatchers = (listId: string, dispatch: Function): void => {
   });
 };
 
-export const removeWatchers = () => {
-  database.ref('/lists').off();
-  database.ref('/items').off();
+export const removeWatchers = (listId: string) => {
+  database.ref(`/lists/${listId}`).off();
+  database.ref(`/lists/${listId}/name`).off();
+  database.ref(`/items/${listId}`).off();
 };

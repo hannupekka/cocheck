@@ -1,5 +1,9 @@
 @import '~styles/main';
 
+.wrapper {
+  width: 100%;
+}
+
 .input__wrapper {
   margin: (@padding * 2) 0;
   text-align: center;
@@ -7,7 +11,6 @@
 
 .input {
   composes: base__input;
-  width: 100%;
 }
 
 .empty {
@@ -22,9 +25,9 @@
   margin-top: @padding * 2;
 }
 
-@media @md {
-  .input,
-  .empty {
+@media @lg {
+  .wrapper {
     width: 50%;
+    margin: auto;
   }
 }

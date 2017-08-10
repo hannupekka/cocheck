@@ -58,7 +58,12 @@ export class ListItem extends Component {
     });
   };
 
-  onClickOutside = (): void => {
+  onEditSave = (e?: SyntheticInputEvent): void => {
+    // Stop clicks bubbling.
+    if (e) {
+      e.stopPropagation();
+    }
+
     const { id } = this.props;
     const { name } = this.state;
 
@@ -71,7 +76,7 @@ export class ListItem extends Component {
 
   onKeyDown = (e: KeyboardEvent): void => {
     if (e.key === 'Enter') {
-      this.onClickOutside();
+      this.onEditSave();
     } else if (e.key === 'Escape') {
       this.props.onEditCancel();
     }
@@ -98,7 +103,7 @@ export class ListItem extends Component {
     />;
 
   render() {
-    const { checked } = this.props;
+    const { checked, isEdited } = this.props;
     const icon = checked ? 'fa fa-check-square-o' : 'fa fa-square-o';
 
     return (
@@ -111,13 +116,17 @@ export class ListItem extends Component {
         </div>
         <div styleName="name">
           {this.props.isEdited
-            ? <ClickOutside onClickOutside={this.onClickOutside}>
+            ? <ClickOutside onClickOutside={this.onEditSave}>
                 {this.renderName()}
               </ClickOutside>
             : this.renderName()}
         </div>
         <div styleName="edit">
-          <i className="fa fa-pencil" aria-hidden onClick={this.onEdit} />
+          <i
+            className={isEdited ? 'fa fa-check' : 'fa fa-pencil'}
+            aria-hidden
+            onClick={isEdited ? this.onEditSave : this.onEdit}
+          />
         </div>
         <div styleName="delete">
           <i className="fa fa-trash-o" aria-hidden onClick={this.onDelete} />

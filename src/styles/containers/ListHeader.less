@@ -1,32 +1,16 @@
 @import '~styles/main';
 
-.static {
-  margin: 0 -@padding;
+.wrapper {
   text-align: center;
-}
-
-.sticky {
-  composes: static;
-  background-color: @color__light;
-  padding: @padding 0;
-  width: 100% !important;
-  border-bottom: 1px solid darken(@color__light, 15%);
-  font-size: 80%;
-  z-index: 9998;
 }
 
 .name {
   margin: 0 auto @padding * 2;
   position: relative;
-
-  .sticky & {
-    display: inline;
-    margin: 0 @padding--half 0 0;
-  }
 }
 
 .name--click {
-  display: inline;
+  display: block;
 }
 
 .display {
@@ -37,7 +21,6 @@
   border-left-color: @color__light;
   border-right-color: @color__light;
   background-color: @color__light;
-  width: calc(~"100%" - @padding * 2);
 }
 
 .edit {
@@ -68,7 +51,7 @@
 
 .button--edit {
   position: absolute;
-  right: @padding;
+  right: 0;
   padding: @padding / 2;
   opacity: 0.5;
   transition: 0.1s opacity linear;
@@ -88,11 +71,5 @@
 
   .button__text {
     display: inline;
-  }
-}
-
-@media @md {
-  .name {
-    width: 50%;
   }
 }

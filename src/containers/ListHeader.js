@@ -15,8 +15,6 @@ type Props = {
   listId: string,
   listName: string,
   listItems: Array<Item>,
-  isSticky: boolean,
-  style: Object,
 };
 
 type State = {
@@ -110,7 +108,7 @@ export class ListHeader extends Component {
     });
   };
 
-  onNameClickOutside = (): void => {
+  onNameEditSave = (): void => {
     const { dispatch } = this.props;
     this.setState({ edit: false });
 
@@ -132,7 +130,7 @@ export class ListHeader extends Component {
 
   onKeyDown = (e: KeyboardEvent): void => {
     if (e.key === 'Enter') {
-      this.onNameClickOutside();
+      this.onNameEditSave();
     } else if (e.key === 'Escape') {
       this.onNameEditCancel();
     }
@@ -151,15 +149,19 @@ export class ListHeader extends Component {
         onChange={this.onNameChange}
         onKeyDown={this.onKeyDown}
       />
-      <i className="fa fa-pencil" styleName="button--edit" aria-hidden onClick={this.onNameEdit} />
+      <i
+        className={this.state.edit ? 'fa fa-check' : 'fa fa-pencil'}
+        styleName="button--edit"
+        aria-hidden
+        onClick={this.state.edit ? this.onNameEditSave : this.onNameEdit}
+      />
     </div>;
 
   render() {
-    const { style, isSticky } = this.props;
     return (
-      <div style={style} styleName={isSticky ? 'sticky' : 'static'}>
+      <div styleName="wrapper">
         {this.state.edit
-          ? <ClickOutside styleName="name--click" onClickOutside={this.onNameClickOutside}>
+          ? <ClickOutside styleName="name--click" onClickOutside={this.onNameEditSave}>
               {this.renderListName()}
             </ClickOutside>
           : this.renderListName()}
