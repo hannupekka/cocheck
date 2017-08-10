@@ -29,6 +29,7 @@ build/Release
 
 # Dependency directories
 node_modules
+functions/node_modules
 jspm_packages
 
 # Optional npm cache directory
@@ -44,7 +45,8 @@ jspm_packages
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*

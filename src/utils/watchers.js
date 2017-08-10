@@ -7,9 +7,6 @@ export const bindWatchers = (listId: string, dispatch: Function): void => {
   database.ref(`/lists/${listId}`).on('value', listRef => {
     if (listRef.val() === null) {
       dispatch(deleteListSuccess());
-
-      // Remove all list items also.
-      database.ref(`/items/${listId}`).remove();
     }
   });
 

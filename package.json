@@ -96,6 +96,7 @@
     "eslint-plugin-jsx-a11y": "^5.0.3",
     "eslint-plugin-react": "^7.1.0",
     "eventsource-polyfill": "^0.9.6",
+    "firebase-functions": "^0.6.1",
     "flow-bin": "^0.47.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^20.0.4",
