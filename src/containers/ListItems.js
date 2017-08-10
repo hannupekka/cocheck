@@ -7,6 +7,7 @@ import { SortableContainer } from 'react-sortable-hoc';
 import CSSModules from 'react-css-modules';
 import ListItem from 'components/ListItem';
 import { editItem, removeItem, toggleItem } from 'redux/list';
+import getVisibleListItems from 'redux/list/selectors';
 
 type Props = {
   dispatch: Function,
@@ -98,7 +99,7 @@ type MappedState = {
 
 const mapState: Function = (state: RootState): MappedState => ({
   listId: state.list.listId,
-  listItems: state.list.listItems,
+  listItems: getVisibleListItems(state),
 });
 
 export default connect(mapState)(pure(SortableContainer(CSSModules(ListItems, styles))));

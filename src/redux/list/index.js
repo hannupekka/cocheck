@@ -48,6 +48,8 @@ export const TOGGLE_ALL_ITEMS = 'cocheck/list/TOGGLE_ALL_ITEMS';
 export const TOGGLE_ALL_ITEMS_SUCCESS = 'cocheck/list/TOGGLE_ALL_ITEMS_SUCCESS';
 export const TOGGLE_ALL_ITEMS_FAILURE = 'cocheck/list/TOGGLE_ALL_ITEMS_FAILURE';
 
+export const SET_LIST_FILTER = 'cocheck/list/SET_LIST_FILTER';
+
 export const createList = (listName: string): ThunkAction => ({
   type: CREATE_LIST,
   payload: {
@@ -252,6 +254,13 @@ export const toggleAllItemsSuccess = (): ThunkAction => ({
 export const toggleAllItemsFailure = (): ThunkAction => ({
   type: TOGGLE_ALL_ITEMS_FAILURE,
   payload: {},
+});
+
+export const setListFilter = (listFilter: ListFilter): ThunkAction => ({
+  type: SET_LIST_FILTER,
+  payload: {
+    listFilter,
+  },
 });
 
 export const handleError = (error: Object): ThunkAction => ({
@@ -561,6 +570,7 @@ export const initialState: ListState = {
   listId: '',
   listName: '',
   listItems: [],
+  listFilter: 'all',
 };
 
 export default function reducer(state: ListState = initialState, action: ThunkAction): ListState {
@@ -630,6 +640,11 @@ export default function reducer(state: ListState = initialState, action: ThunkAc
         ...state,
         listName: action.payload.listName,
         isLoading: false,
+      };
+    case SET_LIST_FILTER:
+      return {
+        ...state,
+        listFilter: action.payload.listFilter,
       };
     default:
       return state;

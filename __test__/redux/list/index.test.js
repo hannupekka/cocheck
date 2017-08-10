@@ -386,6 +386,17 @@ describe('List actions', () => {
 
     expect(List.handleError(error)).toEqual(expected);
   });
+
+  it('should create action to set filter', () => {
+    const expected = {
+      type: List.SET_LIST_FILTER,
+      payload: {
+        listFilter: 'checked',
+      },
+    };
+
+    expect(List.setListFilter('checked')).toEqual(expected);
+  });
 });
 
 describe('List reducer', () => {
@@ -1128,5 +1139,23 @@ describe('List reducer', () => {
     expect(
       reducer(List.initialState, action)
     ).toEqual(List.initialState);
+  });
+
+  it('should handle SET_LIST_FILTER', () => {
+    const action = {
+      type: List.SET_LIST_FILTER,
+      payload: {
+        listFilter: 'checked',
+      },
+    };
+
+    const expected = {
+      ...List.initialState,
+      listFilter: 'checked',
+    };
+
+    expect(
+      reducer(List.initialState, action)
+    ).toEqual(expected);
   });
 });

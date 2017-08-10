@@ -1,9 +1,18 @@
 // @flow
 import { createSelector } from 'reselect';
 
-const getItems = (state: RootState): Array<Item> => state.list.listItems;
+const getListItems = (state: RootState): Array<Item> => state.list.listItems;
+const getListFilter = (state: RootState): ListFilter => state.list.listFilter;
 
 export default createSelector(
-  [getItems],
-  (items): Array<Item> => items
+  [getListItems, getListFilter],
+  (listItems, listFilter): Array<Item> => {
+    if (listFilter === 'checked') {
+      return listItems.filter(item => item.checked);
+    } else if (listFilter === 'unchecked') {
+      return listItems.filter(item => !item.checked);
+    }
+
+    return listItems;
+  }
 );

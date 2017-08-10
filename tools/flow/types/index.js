@@ -46,7 +46,8 @@ declare type ListState = {
   +isLoading: boolean,
   +listId: string,
   +listName: string,
-  +listItems: Array<Item>
+  +listItems: Array<Item>,
+  +listFilter: ListFilter,
 }
 
 declare type RootState = {
@@ -55,3 +56,5 @@ declare type RootState = {
   +list: ListState,
   +router: Object,
 }
+
+declare type ListFilter = 'all' | 'checked' | 'unchecked';

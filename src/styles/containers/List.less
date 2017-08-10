@@ -16,7 +16,44 @@
 .empty {
   margin: 0 auto;
   text-align: center;
+  color: darken(@color__light, 30%);
 }
+
+.empty--filtered {
+  composes: empty;
+  margin-top: @padding * 1.5;
+}
+
+.filters {
+  color: darken(@color__light, 30%);
+  text-align: right;
+  margin-bottom: @padding--half;
+}
+
+.filters__separator {
+  margin: 0 (@padding--half / 2);
+}
+
+.filter {
+  color: darken(@color__light, 30%);
+  padding: @padding--half;
+  transition: 0.1s color linear;
+
+  &:hover {
+    cursor: pointer;
+    color: #000;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.filter--active {
+  composes: filter;
+  color: #000;
+}
+
 
 .help {
   font-size: 70%;

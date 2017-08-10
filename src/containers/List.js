@@ -4,12 +4,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { arrayMove } from 'react-sortable-hoc';
 import { Helmet } from 'react-helmet';
+import { pure } from 'recompose';
 import CSSModules from 'react-css-modules';
 import ListHeader from 'containers/ListHeader';
 import ListItems from 'containers/ListItems';
 import { bindWatchers, removeWatchers } from 'utils/watchers';
-import { readList, addItem, sortItems } from 'redux/list';
-import getItems from 'redux/list/selectors';
+import { readList, addItem, sortItems, setListFilter } from 'redux/list';
+import getVisibleListItems from 'redux/list/selectors';
 
 type Props = {
   dispatch: Function,
@@ -17,6 +18,8 @@ type Props = {
   listId: string,
   listName: string,
   listItems: Array<Item>,
+  listItemsFiltered: Array<Item>,
+  listFilter: ListFilter,
   isLoading: boolean,
 };
 
@@ -95,6 +98,21 @@ export class List extends Component {
     );
   };
 
+  onShowAll = (): void => {
+    const { dispatch } = this.props;
+    dispatch(setListFilter('all'));
+  };
+
+  onShowChecked = (): void => {
+    const { dispatch } = this.props;
+    dispatch(setListFilter('checked'));
+  };
+
+  onShowUnchecked = (): void => {
+    const { dispatch } = this.props;
+    dispatch(setListFilter('unchecked'));
+  };
+
   maybeRenderHeader = (): ?React$Element<any> => {
     const { isLoading, listId } = this.props;
 
@@ -136,10 +154,18 @@ export class List extends Component {
   };
 
   maybeRenderItems = (): ?React$Element<any> => {
-    const { listItems, listId, isLoading } = this.props;
+    const { listItems, listItemsFiltered, listId, listFilter, isLoading } = this.props;
 
     if (!isLoading && listId !== '' && listItems.length === 0) {
       return <div styleName="empty">No items yet - add some</div>;
+    }
+
+    if (listItems.length > 0 && listItemsFiltered.length === 0) {
+      return (
+        <div styleName="empty--filtered">
+          List has no {listFilter} items
+        </div>
+      );
     }
 
     return (
@@ -151,6 +177,45 @@ export class List extends Component {
         lockToContainerEdges
         useDragHandle
       />
+    );
+  };
+
+  maybeRenderFilters = (): ?React$Element<any> => {
+    const { listItems, listFilter } = this.props;
+
+    if (listItems.length === 0) {
+      return null;
+    }
+
+    return (
+      <div styleName="filters">
+        <a
+          tabIndex={0}
+          role="button"
+          styleName={listFilter === 'all' ? 'filter--active' : 'filter'}
+          onClick={this.onShowAll}
+        >
+          All
+        </a>
+        <span styleName="filters__separator">-</span>
+        <a
+          tabIndex={0}
+          role="button"
+          styleName={listFilter === 'checked' ? 'filter--active' : 'filter'}
+          onClick={this.onShowChecked}
+        >
+          Checked
+        </a>
+        <span styleName="filters__separator">-</span>
+        <a
+          tabIndex={0}
+          role="button"
+          styleName={listFilter === 'unchecked' ? 'filter--active' : 'filter'}
+          onClick={this.onShowUnchecked}
+        >
+          Unchecked
+        </a>
+      </div>
     );
   };
 
@@ -166,6 +231,7 @@ export class List extends Component {
         </Helmet>
         {this.maybeRenderHeader()}
         {this.maybeRenderInput()}
+        {this.maybeRenderFilters()}
         {this.maybeRenderItems()}
         {this.maybeRenderHelp()}
       </div>
@@ -177,6 +243,8 @@ type MappedState = {
   listId: string,
   listName: string,
   listItems: Array<Item>,
+  listItemsFiltered: Array<Item>,
+  listFilter: ListFilter,
   isLoading: boolean,
 };
 
@@ -184,8 +252,10 @@ type MappedState = {
 const mapState: Function = (state: RootState): MappedState => ({
   listId: state.list.listId,
   listName: state.list.listName,
-  listItems: getItems(state),
+  listItems: state.list.listItems,
+  listItemsFiltered: getVisibleListItems(state),
+  listFilter: state.list.listFilter,
   isLoading: state.list.isLoading,
 });
 
-export default connect(mapState)(CSSModules(List, styles));
+export default connect(mapState)(pure(CSSModules(List, styles)));

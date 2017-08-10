@@ -8,7 +8,7 @@ import DebounceInput from 'react-debounce-input';
 import CSSModules from 'react-css-modules';
 import * as ConfirmActions from 'redux/confirm';
 import * as ListActions from 'redux/list';
-import getItems from 'redux/list/selectors';
+import getListItems from 'redux/list/selectors';
 
 type Props = {
   dispatch: Function,
@@ -192,7 +192,7 @@ type MappedState = {
 const mapState: Function = (state: RootState): MappedState => ({
   listId: state.list.listId,
   listName: state.list.listName,
-  listItems: getItems(state),
+  listItems: getListItems(state),
 });
 
 export default connect(mapState)(pure(CSSModules(ListHeader, styles)));
