@@ -3,17 +3,21 @@ import database from 'utils/database';
 import { deleteListSuccess, readListItemsSuccess, renameListSuccess } from 'redux/list';
 
 export const bindWatchers = (listId: string, dispatch: Function): void => {
-  // List renamed.
-  database.ref(`/lists/${listId}/name`).on('value', nameRef => {
-    dispatch(renameListSuccess(nameRef.val()));
+  // List removed.
+  database.ref(`/lists/${listId}`).on('value', listRef => {
+    if (listRef.val() === null) {
+      dispatch(deleteListSuccess());
+
+      // Remove all list items also.
+      database.ref(`/items/${listId}`).remove();
+    }
   });
 
-  // List removed.
-  database.ref('/lists').orderByKey().equalTo(listId).on('child_removed', () => {
-    dispatch(deleteListSuccess());
-
-    // Remove all list items also.
-    database.ref(`/items/${listId}`).remove();
+  // List renamed.
+  database.ref(`/lists/${listId}/name`).on('value', nameRef => {
+    if (nameRef.val() !== null) {
+      dispatch(renameListSuccess(nameRef.val()));
+    }
   });
 
   // List item updates.

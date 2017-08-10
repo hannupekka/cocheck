@@ -130,11 +130,7 @@ export class List extends Component {
       return null;
     }
 
-    return (
-      <div styleName="help">
-        Share this list to others by giving them URL of this page.
-      </div>
-    );
+    return <div styleName="help">Share this list to others by giving them URL of this page.</div>;
   };
 
   maybeRenderItems = (): ?React$Element<any> => {
