@@ -2,6 +2,7 @@ const path = require('path');
 const express = require('express');
 const compression = require('compression');
 const helmet = require('helmet');
+const sslRedirect = require('heroku-ssl-redirect');
 
 const app = express();
 
@@ -11,6 +12,7 @@ const PORT = process.env.PORT || 8080;
 // Middlewares
 app.use(compression());
 app.use(helmet());
+app.use(sslRedirect());
 
 // Static files.
 app.use(express.static('dist/'));
