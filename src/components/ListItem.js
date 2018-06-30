@@ -87,7 +87,7 @@ export class ListItem extends Component {
   };
 
   onDelete = (): void => {
-    this.props.onRemove(this.props.id);
+    this.props.onRemove(this.props.name, this.props.id);
   };
 
   renderName = (): React$Element<any> =>

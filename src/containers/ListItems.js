@@ -6,6 +6,7 @@ import { pure } from 'recompose';
 import { SortableContainer } from 'react-sortable-hoc';
 import CSSModules from 'react-css-modules';
 import ListItem from 'components/ListItem';
+import * as ConfirmActions from 'redux/confirm';
 import { editItem, removeItem, toggleItem } from 'redux/list';
 import getVisibleListItems from 'redux/list/selectors';
 
@@ -53,7 +54,17 @@ export class ListItems extends Component {
     this.setState({ editItemId: null });
   };
 
-  onRemove = (itemId: string) => {
+  onRemove = (name: string, itemId: string): void => {
+    const { dispatch } = this.props;
+    dispatch(
+      ConfirmActions.showConfirmation({
+        text: `Really delete ${name}?`,
+        onConfirm: () => this.onRemoveConfirm(itemId),
+      })
+    );
+  };
+
+  onRemoveConfirm = (itemId: string) => {
     const { dispatch, listId } = this.props;
 
     dispatch(removeItem({ itemId, listId }));

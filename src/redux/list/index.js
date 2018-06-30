@@ -451,9 +451,13 @@ export const removeItemEpic = (action$: Observable<Action>): Observable<Action> 
       try {
         itemRef.remove();
 
-        return Observable.of(removeItemSuccess());
+        return Observable.concat(
+          Observable.of(removeItemSuccess()),
+          Observable.of(hideConfirmation())
+        );
       } catch (e) {
         return Observable.concat(
+          Observable.of(hideConfirmation()),
           Observable.of(removeItemFailure()),
           Observable.of(showNotification({
             title: 'Error',
