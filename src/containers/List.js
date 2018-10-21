@@ -6,6 +6,7 @@ import { arrayMove } from 'react-sortable-hoc';
 import { Helmet } from 'react-helmet';
 import { pure } from 'recompose';
 import CSSModules from 'react-css-modules';
+import Stickyfill from 'stickyfilljs';
 import ListHeader from 'containers/ListHeader';
 import ListItems from 'containers/ListItems';
 import { bindWatchers, removeWatchers } from 'utils/watchers';
@@ -50,6 +51,9 @@ export class List extends Component {
     if (this.itemInput) {
       this.itemInput.focus();
     }
+
+    const sticky = document.querySelector('#sticky');
+    Stickyfill.addOne(sticky);
   };
 
   componentWillUnmount = (): void => {
@@ -79,6 +83,11 @@ export class List extends Component {
           listId,
         })
       );
+
+      const body = document.querySelector('body');
+      if (body) {
+        window.scrollTo(0, body.scrollHeight);
+      }
     }
   };
 
@@ -131,7 +140,7 @@ export class List extends Component {
     }
 
     return (
-      <div styleName="input__wrapper">
+      <div id="sticky" styleName="input__wrapper">
         <input
           ref={this.bindItemInput}
           styleName="input"
