@@ -58,6 +58,9 @@ module.exports = {
         warnings: false,
         drop_console: true,
       },
+      output: {
+        comments: false,
+      },
     }),
     new HtmlWebpackPlugin({
       template: './src/html/index.prod.html',
